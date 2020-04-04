@@ -1,7 +1,9 @@
 package com.jc770797.catimageprocess;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -18,9 +20,13 @@ import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.imgproc.Imgproc;
 
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+
 public class ImageMorphological extends AppCompatActivity {
 
-    public static Bitmap greyImageMap = ImageEditingActivity.getBitmap();
+    public  Bitmap greyImageMap ;
     private Button nextPageBtn, applyBtn;
     private ImageView imgSelect;
     private Spinner spinner;
@@ -30,20 +36,17 @@ public class ImageMorphological extends AppCompatActivity {
     private int kernelSize;
 
 
-    public static Bitmap getBitmap() {
-        return greyImageMap;
-    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_image_morph);
 
-
+        fileGetter();
         imgSelect = findViewById(R.id.imageIn);
         imgSelect.setImageBitmap(greyImageMap);
 
 
-        this.greyImageMap = ImageEditingActivity.getBitmap();
+
 
 
         nextPageListener();
@@ -51,13 +54,29 @@ public class ImageMorphological extends AppCompatActivity {
         seekBarListener();
     }
 
+    protected void onStart(){
+        super.onStart();
+        fileGetter();
+        imgSelect.setImageBitmap(greyImageMap);
+    }
     private void nextPageListener() {
         nextPageBtn = findViewById(R.id.continueBtn2);
 
         nextPageBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(ImageMorphological.this, ImageSnakeActivity.class));
+                try{
+                    //Write the file to storage
+                    String tempFilename = "catPr_bitmap.png";
+                    fileWriter(tempFilename);
+                    greyImageMap.recycle();
+                    //Create the intent and add the filename to it
+                    Intent intent = new Intent(ImageMorphological.this, ImageSnakeActivity.class);
+                    intent.putExtra("image", tempFilename);
+                    startActivity(intent);
+                }catch(Exception e){
+                    e.printStackTrace();
+                }
             }
         });
     }
@@ -189,6 +208,25 @@ public class ImageMorphological extends AppCompatActivity {
         Mat tmpOut = new Mat(greyImageMap.getWidth(), greyImageMap.getHeight(), CvType.CV_8UC1);
         Utils.bitmapToMat(greyImageMap, tmpOut);
         return tmpOut;
+    }
+
+    private void fileGetter(){
+        String tempFilename = getIntent().getStringExtra("image");
+        try {
+            FileInputStream is = ImageMorphological.this.openFileInput(tempFilename);
+            greyImageMap = BitmapFactory.decodeStream(is);
+            is.close();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+    }
+    private void fileWriter(String tempFilename) throws IOException {
+
+        FileOutputStream stream = ImageMorphological.this.openFileOutput(tempFilename, Context.MODE_PRIVATE);
+        greyImageMap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+        //Close the steam
+        stream.close();
     }
 
 }

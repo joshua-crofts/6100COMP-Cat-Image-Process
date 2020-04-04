@@ -2,6 +2,7 @@ package com.jc770797.catimageprocess;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -20,11 +21,13 @@ import org.opencv.android.Utils;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 
+import java.io.FileInputStream;
+
 
 public class ImageSnakeActivity extends AppCompatActivity {
 
 
-    public static Bitmap greyImageMap = ImageMorphological.getBitmap();
+    public Bitmap greyImageMap ;
     private ImageView imgSelect, imgOverlay;
     private Button nextPageBtn, beginBtn,snakeBegin;
     int[] viewCords = new int[2];
@@ -37,6 +40,8 @@ public class ImageSnakeActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_snake);
+
+        fileGetter();
 
         imgOverlay = findViewById(R.id.imageViewSnakeOverlay);
         imgSelect = findViewById(R.id.imageViewSnake);
@@ -55,16 +60,14 @@ public class ImageSnakeActivity extends AppCompatActivity {
         //pointListener();
     }
 
-    public static Bitmap getBitmap() {
-        return greyImageMap;
-    }
-
     private void snakeStartListener() {
         beginBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
                 Intent intentOverlay = new Intent(ImageSnakeActivity.this, SnakeOverlayActivity.class);
+                String tempFilename = "catPr_bitmap.png";
+                intentOverlay.putExtra("image", tempFilename);
                 startActivityForResult(intentOverlay, 0);
 
                 Mat imageOut = new Mat(greyImageMap.getWidth(), greyImageMap.getHeight(), CvType.CV_8UC1);
@@ -98,11 +101,18 @@ public class ImageSnakeActivity extends AppCompatActivity {
                 //snake.start(ImageSnakeActivity.this, 1.2, 1, 1.2, 5, 200);
             }
         });
-
-
     }
 
-
+    private void fileGetter(){
+        String tempFilename = getIntent().getStringExtra("image");
+        try {
+            FileInputStream is = ImageSnakeActivity.this.openFileInput(tempFilename);
+            greyImageMap = BitmapFactory.decodeStream(is);
+            is.close();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
 
 
 

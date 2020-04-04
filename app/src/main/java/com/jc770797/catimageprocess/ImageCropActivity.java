@@ -1,7 +1,9 @@
 package com.jc770797.catimageprocess;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -14,6 +16,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 
 public class ImageCropActivity extends AppCompatActivity {
@@ -25,30 +30,28 @@ public class ImageCropActivity extends AppCompatActivity {
     ImageView imgCrop;
 
     //Image holders
-    public static Bitmap imageMap;
-    public Uri imageUri = ImageSelectionActivity.getUri();
+    public  Bitmap imageMap;
+    public Uri imageUri;
+    boolean test = true;
 
-    public static Bitmap getBitmap(){
-        return imageMap;
-    }
-    private void setBitmap(){
-        this.imageMap = ImageSelectionActivity.getBitmap();
-    }
-    private void setBitmap(Bitmap map){
-        this.imageMap = map;
-    }
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_image_crop);
 
+
+        fileGetter();
+        imageUri = getIntent().getParcelableExtra("imageUri");
+
         //assigning the objects to the layout
         imgCrop = findViewById(R.id.imageIn);
         cropBtn = findViewById(R.id.cropBtn);
         nextPageBtn = findViewById(R.id.nextPageBtn);
 
-        setBitmap();
+        //setBitmap();
 
         imgCrop.setImageBitmap(imageMap);
         cropBtn.setOnClickListener(new View.OnClickListener() {
@@ -61,10 +64,42 @@ public class ImageCropActivity extends AppCompatActivity {
         nextPageBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(ImageCropActivity.this, ImageEditingActivity.class));
+
+                try{
+                    //Write the file to storage
+                    String tempFilename = "catPr_bitmap.png";
+                    fileWriter(tempFilename);
+                    //imageMap.recycle();
+
+                    //Create the intent and add the filename to it
+                    Intent intent = new Intent(ImageCropActivity.this, ImageEditingActivity.class);
+                    intent.putExtra("image", tempFilename);
+                    startActivity(intent);
+                }catch(Exception e){
+                    e.printStackTrace();
+                }
             }
         });
 
+    }
+
+    @Override
+    protected void onStart(){
+        super.onStart();
+        if(test){
+
+            fileGetter();
+            try {
+                imgCrop.setImageBitmap(imageMap);
+            }catch (Exception e){
+                e.printStackTrace();
+
+            }
+
+
+            imageUri = Uri.fromFile(new File(ImageCropActivity.this.getFilesDir() + "/catPr_bitmap.png"));
+            test = true;
+        }
     }
 
     //start crop activity view
@@ -78,15 +113,18 @@ public class ImageCropActivity extends AppCompatActivity {
     //handle the image on activity result
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
             CropImage.ActivityResult result = CropImage.getActivityResult(data);
             if (resultCode == RESULT_OK) {
                 Uri resultUri = result.getUri();
-                try{
+                try {
                     Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), resultUri);
-                    imgCrop.setImageBitmap(bitmap);
-                    setBitmap(bitmap);
-                }catch (IOException e){
+
+                    imageMap = bitmap;
+                    imgCrop.setImageBitmap(imageMap);
+                    test = false;
+                } catch (IOException e) {
                     e.printStackTrace();
                 }
 
@@ -97,5 +135,25 @@ public class ImageCropActivity extends AppCompatActivity {
         }
     }
 
+    private void fileGetter(){
+        String tempFilename = getIntent().getStringExtra("image");
+        try {
+            FileInputStream is = ImageCropActivity.this.openFileInput(tempFilename);
+            imageMap = BitmapFactory.decodeStream(is);
+            is.close();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+    }
+
+    private void fileWriter(String tempFilename) throws IOException {
+        FileOutputStream stream = ImageCropActivity.this.openFileOutput(tempFilename, Context.MODE_PRIVATE);
+        imageMap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+
+
+        //Close the steam
+        stream.close();
+    }
 
 }

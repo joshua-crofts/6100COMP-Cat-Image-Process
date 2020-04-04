@@ -1,8 +1,10 @@
 package com.jc770797.catimageprocess;
 
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -22,15 +24,19 @@ import org.opencv.core.Mat;
 import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+
 public class ImageEditingActivity extends AppCompatActivity {
 
     //Image objects
-    public Bitmap colourImageMap = ImageCropActivity.getBitmap();
-    public static Bitmap greyImageMap, baseGreyImage;
+    public Bitmap colourImageMap ;//= ImageCropActivity.getBitmap()
+    public  Bitmap greyImageMap, baseGreyImage;
     private ImageView imgSelect;
 
     private Spinner spinner;
-    private ImgState state;
+
     private SeekBar seekBar, kernelSeekBar;
 
     private TextView textView, KernelSizeTextView;
@@ -40,31 +46,20 @@ public class ImageEditingActivity extends AppCompatActivity {
     private Mat globalTmp;
 
 
-
-    public static Bitmap getBitmap() {
-        return greyImageMap;
-    }
-
-
-    private enum ImgState {
-        IMAGE_SMOOTH,
-        IMAGE_ERODE,
-        IMAGE_DILATE,
-        IMAGE_THRESHOLD,
-        IMAGE_FREE
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_image_edit);
 
+        fileGetter();
+
         //set the grey image map
         greyImageMap = Bitmap.createBitmap(colourImageMap.getWidth(), colourImageMap.getHeight(), colourImageMap.getConfig());
 
 
+
+
         //assigning the objects to the layout
-        state = ImgState.IMAGE_FREE;
         imgSelect = findViewById(R.id.imageIn);
         imgSelect.setImageBitmap(colourImageMap);
 
@@ -75,6 +70,14 @@ public class ImageEditingActivity extends AppCompatActivity {
         seekBarListener();
     }
 
+    @Override
+    protected void onStart(){
+        super.onStart();
+        fileGetter();
+        greyImageMap = Bitmap.createBitmap(colourImageMap.getWidth(), colourImageMap.getHeight(), colourImageMap.getConfig());
+        filterGreyScale();
+    }
+
     //Listener for next page button
     private void nextPageListener() {
         Button nextPageBtn;
@@ -82,7 +85,20 @@ public class ImageEditingActivity extends AppCompatActivity {
         nextPageBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(ImageEditingActivity.this, ImageMorphological.class));
+                try{
+
+                    //Write the file to storage
+                    String tempFilename = "catPr_bitmap.png";
+                    fileWriter(tempFilename);
+                    greyImageMap.recycle();
+                    colourImageMap.recycle();
+                    //Create the intent and add the filename to it
+                    Intent intent = new Intent(ImageEditingActivity.this, ImageMorphological.class);
+                    intent.putExtra("image", tempFilename);
+                    startActivity(intent);
+                }catch(Exception e){
+                    e.printStackTrace();
+                }
             }
         });
     }
@@ -199,22 +215,17 @@ public class ImageEditingActivity extends AppCompatActivity {
             case "Image Smooth":
                 Toast.makeText(ImageEditingActivity.this, "Applying Gaussian Smooth", Toast.LENGTH_SHORT).show();
                 filterSmooth();
-                state = ImgState.IMAGE_SMOOTH;
                 break;
             case "Erode":
                 Toast.makeText(ImageEditingActivity.this, "Applying Erosion", Toast.LENGTH_SHORT).show();
-                filterErode();
-                state = ImgState.IMAGE_ERODE;
                 break;
             case "Dilate":
                 Toast.makeText(ImageEditingActivity.this, "Applying Dilation", Toast.LENGTH_SHORT).show();
                 filterDilate();
-                state = ImgState.IMAGE_DILATE;
                 break;
             case "Adaptive Threshold":
                 Toast.makeText(ImageEditingActivity.this, "Applying Adaptive Threshold", Toast.LENGTH_SHORT).show();
                 adaptiveThreshold();
-                state = ImgState.IMAGE_THRESHOLD;
                 break;
             case "Threshold":
                 Toast.makeText(ImageEditingActivity.this, "Applying Threshold", Toast.LENGTH_SHORT).show();
@@ -295,7 +306,25 @@ public class ImageEditingActivity extends AppCompatActivity {
         imgSelect.setImageBitmap(greyImageMap);
     }
 
+    private void fileGetter(){
+        String tempFilename = getIntent().getStringExtra("image");
+        try {
+            FileInputStream is = ImageEditingActivity.this.openFileInput(tempFilename);
+            colourImageMap = BitmapFactory.decodeStream(is);
+            is.close();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
 
+    }
+
+    private void fileWriter(String tempFilename) throws IOException {
+
+        FileOutputStream stream = ImageEditingActivity.this.openFileOutput(tempFilename, Context.MODE_PRIVATE);
+        greyImageMap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+        //Close the steam
+        stream.close();
+    }
 
 
 }

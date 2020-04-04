@@ -1,5 +1,6 @@
 package com.jc770797.catimageprocess;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -9,10 +10,9 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
-
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-
+import java.io.FileOutputStream;
 import java.io.IOException;
 
 public class ImageSelectionActivity extends AppCompatActivity {
@@ -22,17 +22,10 @@ public class ImageSelectionActivity extends AppCompatActivity {
     //Image View
     ImageView imgView;
     //Image holders
-    public static Uri imageUri;
-    public static Bitmap imageMap;
+    public  Uri imageUri;
+    public  Bitmap imageMap;
     //Image check bool
     private boolean imgSelected = false;
-    //Image Getters
-    public static Bitmap getBitmap() {
-        return imageMap;
-    }
-    public static Uri getUri() {
-        return imageUri;
-    }
 
 
     @Override
@@ -42,7 +35,6 @@ public class ImageSelectionActivity extends AppCompatActivity {
 
         //assigning the objects to the layout
         imgView = findViewById(R.id.imgView);
-
         buttonListener();
     }
 
@@ -68,7 +60,21 @@ public class ImageSelectionActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if(imgSelected == true) {
-                    startActivity(new Intent(ImageSelectionActivity.this, ImageCropActivity.class));
+
+                    try{
+                        //Write the file to storage
+                        String tempFilename = "catPr_bitmap.png";
+                        fileWriter(tempFilename);
+
+
+                        //Create the intent and add the filename to it
+                        Intent intent = new Intent(ImageSelectionActivity.this, ImageCropActivity.class);
+                        intent.putExtra("image", tempFilename);
+                        intent.putExtra("imageUri", imageUri);
+                        startActivity(intent);
+                    }catch(Exception e){
+                        e.printStackTrace();
+                    }
                 }else{
                     Toast.makeText(ImageSelectionActivity.this,"Please Select an image",Toast.LENGTH_SHORT).show();
                 }
@@ -97,6 +103,15 @@ public class ImageSelectionActivity extends AppCompatActivity {
             }
             imgSelected = true;
         }
+    }
+
+    //Save the image to storage to be called in the next activity
+    private void fileWriter(String tempFilename) throws IOException {
+
+        FileOutputStream stream = ImageSelectionActivity.this.openFileOutput(tempFilename, Context.MODE_PRIVATE);
+        imageMap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+        //Close the steam
+        stream.close();
     }
 
 
