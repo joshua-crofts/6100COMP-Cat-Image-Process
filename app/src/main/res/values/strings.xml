@@ -1,0 +1,39 @@
+<resources>
+    <string name="app_name">Cat Image Process</string>
+
+
+
+    <!--Global Strings-->
+    <string name="continue_button">Continue</string>
+    <string name="applyButton">Apply</string>
+
+    <!--App Main Strings-->
+    <string name="page_title">Cat Image Processor</string>
+
+    <!--App Image Selector Strings-->
+    <string name="upload_button">Upload</string>
+    <string name="main_text">Please select an appropriate cat image to upload</string>
+
+    <!--App Image Crop Strings-->
+
+    <!--App Image Edit Strings-->
+    <string-array name="drop_down_opt">
+        <item>Image Smooth</item>
+        <item>Erode</item>
+        <item>Dilate</item>
+        <item>Adaptive Threshold</item>
+        <item>Threshold</item>
+    </string-array>
+
+
+    <!--App Image Edit Strings-->
+    <string-array name="drop_down_opt_morph">
+        <item>Morphological Open</item>
+        <item>Morphological Close</item>
+        <item>Morphological Erode</item>
+        <item>Morphological Dilate</item>
+        <item>Morphological Eclipse</item>
+        <item>Morphological Rect</item>
+    </string-array>
+
+</resources>
