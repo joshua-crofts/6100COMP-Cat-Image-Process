@@ -2,8 +2,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="com.jc770797.catimageprocess">
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
     <application
         android:allowBackup="true"
         android:debuggable="false"
@@ -13,10 +15,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.Light.DarkActionBar"
         tools:ignore="HardcodedDebugMode">
-
-        <activity android:name=".MainActivity"
+        <activity
+            android:name=".MainActivity"
             android:screenOrientation="portrait">
-
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -25,32 +26,32 @@
         </activity>
         <activity
             android:name=".ImageSelectionActivity"
-            android:screenOrientation="portrait"
-            android:label="Image Selection"/>
+            android:label="Image Selection"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".ImageCropActivity"
-            android:screenOrientation="portrait"
-            android:label="Image Crop"/>
+            android:label="Image Crop"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".ImageEditingActivity"
-            android:screenOrientation="portrait"
-            android:label="Basic Image Editing"/>
+            android:label="Basic Image Editing"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".ImageMorphological"
-            android:screenOrientation="portrait"
-            android:label="Morphological Editing"/>
+            android:label="Morphological Editing"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".ImageSnakeActivity"
-            android:screenOrientation="portrait"
-            android:label="Snake"/>
+            android:label="Snake"
+            android:screenOrientation="portrait" />
         <activity
-            android:name=".SnakeOverlayActivity"
+            android:name=".fragments.SnakeOverlayPointsFragment"
+            android:label="Snake"
             android:screenOrientation="portrait"
-            android:theme="@style/Theme.AppCompat.Translucent"
-            android:label="Snake"/>
-        <activity android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
-            android:theme="@style/Base.Theme.AppCompat"/>
+            android:theme="@style/Theme.AppCompat.Translucent" />
+        <activity
+            android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
+            android:theme="@style/Base.Theme.AppCompat" />
     </application>
-
 
 </manifest>

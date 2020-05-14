@@ -1,25 +1,27 @@
 package com.jc770797.catimageprocess;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.MotionEvent;
+
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
+
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.viewpager2.widget.ViewPager2;
 
 import com.jc770797.catimageprocess.activeCont.Snake;
-
-
-import org.opencv.android.Utils;
-import org.opencv.core.CvType;
-import org.opencv.core.Mat;
+import com.jc770797.catimageprocess.fragments.SnakeOverlayMainFragment;
+import com.jc770797.catimageprocess.fragments.SnakeOverlayPointsFragment;
 
 import java.io.FileInputStream;
 
@@ -27,14 +29,21 @@ import java.io.FileInputStream;
 public class ImageSnakeActivity extends AppCompatActivity {
 
 
-    public Bitmap greyImageMap ;
-    private ImageView imgSelect, imgOverlay;
-    private Button nextPageBtn, beginBtn,snakeBegin;
-    int[] viewCords = new int[2];
-    float touchx, touchy, imageX, imageY;
-    Snake snake;
+    public Bitmap greyImageMap, overlayImage ;
+    private Button continueBtn;
+    private TextView pointerCount;
+    private FragmentManager frm;
+    private  FragmentTransaction fragmentTransaction;
+    private Fragment mainOverlay = new SnakeOverlayMainFragment();
+    private Snake snake;
 
-    private TextView numPoints;
+
+    public Bitmap getImage(){
+        return this.greyImageMap;
+    }
+    public Bitmap getOverlayImageImage(){
+        return this.overlayImage;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,64 +52,69 @@ public class ImageSnakeActivity extends AppCompatActivity {
 
         fileGetter();
 
-        imgOverlay = findViewById(R.id.imageViewSnakeOverlay);
-        imgSelect = findViewById(R.id.imageViewSnake);
-        imgSelect.setImageBitmap(greyImageMap);
+        continueBtn = findViewById(R.id.continueBtn);
 
-        beginBtn = findViewById(R.id.beginBtn);
-        snakeBegin = findViewById(R.id.startSnakeBtn);
-        numPoints = findViewById(R.id.numOfPoints);
+        frm = getSupportFragmentManager();
+        fragmentTransaction = frm.beginTransaction();
+        fragmentTransaction.replace(R.id.fragmentHolder, mainOverlay);
+        fragmentTransaction.addToBackStack(null);
+        fragmentTransaction.commit();
 
+        snake = new Snake(greyImageMap,true, "Kass");
 
-        snakeBegin.setEnabled(false);
-        snakeBegin.setVisibility(View.INVISIBLE);
+        pointerCount = findViewById(R.id.numOfPoints);
 
+        Bitmap.Config config = Bitmap.Config.ARGB_8888;
+        overlayImage = Bitmap.createBitmap(greyImageMap.getWidth(),greyImageMap.getHeight(),config);
 
-        snakeStartListener();
-        //pointListener();
     }
 
-    private void snakeStartListener() {
-        beginBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+    public void fragmentChange(){
+        Fragment pointsOverlay = new SnakeOverlayPointsFragment();
+        fragmentTransaction = frm.beginTransaction();
+        fragmentTransaction.replace(R.id.fragmentHolder, pointsOverlay);
+        fragmentTransaction.addToBackStack(null);
+        fragmentTransaction.commit();
+    }
+    public void fragmentChange2(){
+        pointerCount.setText("Number of points: " + snake.getNumPoints());
 
-                Intent intentOverlay = new Intent(ImageSnakeActivity.this, SnakeOverlayActivity.class);
-                String tempFilename = "catPr_bitmap.png";
-                intentOverlay.putExtra("image", tempFilename);
-                startActivityForResult(intentOverlay, 0);
+        fragmentTransaction = frm.beginTransaction();
+        fragmentTransaction.replace(R.id.fragmentHolder, mainOverlay);
+        fragmentTransaction.addToBackStack(null);
+        fragmentTransaction.commit();
 
-                Mat imageOut = new Mat(greyImageMap.getWidth(), greyImageMap.getHeight(), CvType.CV_8UC1);
-                Utils.bitmapToMat(greyImageMap,imageOut);
-                snake = new Snake(imageOut,true,"input");
-//                beginBtn.setEnabled(false);
+    }
 
-//                isPointReady = true;
-            }
-        });
+    public void pointAdder(int x, int y){
+        snake.createPoint(x,y);
+        try {
+            overlayImage.setPixel(x-2,y, Color.RED);
+            overlayImage.setPixel(x,y+2, Color.RED);
 
-//        stopBtn.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                imgSelect.setOnTouchListener(null);
-//                snake.printPoints();
-//                isPointReady = false;
-//                stopBtn.setEnabled(false);
-//                snakeBegin.setEnabled(true);
-//                beginBtn.setVisibility(View.INVISIBLE);
-//                stopBtn.setVisibility(View.INVISIBLE);
-//                snakeBegin.setVisibility(View.VISIBLE);
-//                imgOverlay.setImageBitmap(snake.createBitmap());
-//                imgSelect.setVisibility(View.INVISIBLE);
-//            }
-//        });
+            overlayImage.setPixel(x-1,y-1, Color.RED);
+            overlayImage.setPixel(x-1,y+1, Color.RED);
 
-        snakeBegin.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //snake.start(ImageSnakeActivity.this, 1.2, 1, 1.2, 5, 200);
-            }
-        });
+            overlayImage.setPixel(x-1,y, Color.RED);
+            overlayImage.setPixel(x,y+1, Color.RED);
+            overlayImage.setPixel(x,y, Color.RED);
+            overlayImage.setPixel(x,y-1, Color.RED);
+            overlayImage.setPixel(x+1,y, Color.RED);
+
+            overlayImage.setPixel(x+1,y-1, Color.RED);
+            overlayImage.setPixel(x+1,y+1, Color.RED);
+
+            overlayImage.setPixel(x,y-2, Color.RED);
+            overlayImage.setPixel(x+2,y, Color.RED);
+        }catch (Exception e){
+
+        }
+
+
+    }
+
+    public void snakeStart(){
+        snake.start(this);
     }
 
     private void fileGetter(){
@@ -112,7 +126,10 @@ public class ImageSnakeActivity extends AppCompatActivity {
         }catch (Exception e){
             e.printStackTrace();
         }
+
     }
+
+
 
 
 

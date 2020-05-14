@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
@@ -19,6 +18,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import org.opencv.android.Utils;
+import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.Size;
@@ -43,7 +43,7 @@ public class ImageEditingActivity extends AppCompatActivity {
 
     private int threshold = 0, kernelSize = 1;
 
-    private Mat globalTmp;
+    private Mat globalMat;
 
 
     @Override
@@ -129,6 +129,11 @@ public class ImageEditingActivity extends AppCompatActivity {
                     kernelSeekBar.setEnabled(false);
                     textView.setEnabled(true);
                     KernelSizeTextView.setEnabled(false);
+                }else if(position==5){
+                    seekBar.setEnabled(true);
+                    kernelSeekBar.setEnabled(true);
+                    textView.setEnabled(true);
+                    KernelSizeTextView.setEnabled(true);
                 }else {
                     seekBar.setEnabled(false);
                     kernelSeekBar.setEnabled(false);
@@ -218,6 +223,7 @@ public class ImageEditingActivity extends AppCompatActivity {
                 break;
             case "Erode":
                 Toast.makeText(ImageEditingActivity.this, "Applying Erosion", Toast.LENGTH_SHORT).show();
+                filterErode();
                 break;
             case "Dilate":
                 Toast.makeText(ImageEditingActivity.this, "Applying Dilation", Toast.LENGTH_SHORT).show();
@@ -231,9 +237,38 @@ public class ImageEditingActivity extends AppCompatActivity {
                 Toast.makeText(ImageEditingActivity.this, "Applying Threshold", Toast.LENGTH_SHORT).show();
                 filterThreshold();
                 break;
+            case "Testing":
+                Toast.makeText(ImageEditingActivity.this, "Test", Toast.LENGTH_SHORT).show();
+                testSobel();
+                break;
         }
     }
 
+    private void testSobel() {
+        globalMat = matImageSelector();
+        Mat outPut = new Mat();
+        Mat grad_x = new Mat(), grad_y = new Mat();
+        Mat abs_grad_x = new Mat(), abs_grad_y = new Mat();
+        Imgproc.cvtColor(globalMat, globalMat, Imgproc.COLOR_RGB2GRAY);
+        int depth = CvType.CV_16S;
+        Imgproc.Sobel(globalMat, grad_x, depth, 1,0,5, 1, 0, Core.BORDER_DEFAULT);
+        Imgproc.Sobel(globalMat, grad_y, depth, 0,1,5, 1, 0,Core.BORDER_DEFAULT);
+
+        Imgproc.Sobel(globalMat, grad_x, depth, 1,0,5, 1, 0, Core.BORDER_DEFAULT);
+        Imgproc.Sobel(globalMat, grad_y, depth, 0,1,5, 1, 0,Core.BORDER_DEFAULT);
+
+        Core.convertScaleAbs(grad_x,abs_grad_x);
+        Core.convertScaleAbs(grad_y,abs_grad_y);
+
+        //Imgproc.threshold(abs_grad_x, abs_grad_x, threshold, 255, 0);
+        //Imgproc.threshold(abs_grad_y, abs_grad_y, threshold, 255, 0);
+
+
+        Core.addWeighted(abs_grad_x,0.5,abs_grad_y, 0.5, 0, outPut);
+        Core.bitwise_not(outPut,outPut);
+
+        bitmapFrameUpdate(outPut);
+    }
 
 
     /*
@@ -250,38 +285,42 @@ public class ImageEditingActivity extends AppCompatActivity {
     }
 
     private void filterSmooth() {
-        globalTmp = matImageSelector();
+        globalMat = matImageSelector();
         Size si = new Size(5, 5);
-        Imgproc.GaussianBlur(globalTmp, globalTmp, si, 0);
-        bitmapFrameUpdate(globalTmp);
+        Imgproc.GaussianBlur(globalMat, globalMat, si, 0);
+        bitmapFrameUpdate(globalMat);
     }
 
     private void filterErode() {
-        globalTmp = matImageSelector();
+        globalMat = matImageSelector();
         Mat kernel = Mat.ones(kernelSize, kernelSize, CvType.CV_32F);
-        Imgproc.erode(globalTmp, globalTmp, kernel);
-        bitmapFrameUpdate(globalTmp);
+        Imgproc.erode(globalMat, globalMat, kernel);
+        bitmapFrameUpdate(globalMat);
     }
 
     private void filterDilate() {
-        globalTmp = matImageSelector();
+        globalMat = matImageSelector();
         Mat kernel = Mat.ones(kernelSize, kernelSize, CvType.CV_32F);
-        Imgproc.dilate(globalTmp, globalTmp, kernel);
-        bitmapFrameUpdate(globalTmp);
+        Imgproc.dilate(globalMat, globalMat, kernel);
+        bitmapFrameUpdate(globalMat);
     }
 
     private void filterThreshold() {
-        globalTmp = matImageSelector();
-        Imgproc.cvtColor(globalTmp, globalTmp, Imgproc.COLOR_RGB2GRAY);
-        Imgproc.threshold(globalTmp, globalTmp, threshold, 255, 0);
-        bitmapFrameUpdate(globalTmp);
+        globalMat = matImageSelector();
+
+        Imgproc.cvtColor(globalMat, globalMat, Imgproc.COLOR_RGB2GRAY);
+        Imgproc.threshold(globalMat, globalMat, threshold, 255, 0);
+
+        bitmapFrameUpdate(globalMat);
     }
 
     private void adaptiveThreshold() {
-        globalTmp = matImageSelector();
-        Imgproc.cvtColor(globalTmp, globalTmp, Imgproc.COLOR_RGB2GRAY);
-        Imgproc.adaptiveThreshold(globalTmp, globalTmp, 255, Imgproc.ADAPTIVE_THRESH_GAUSSIAN_C, Imgproc.THRESH_BINARY, 15, 2);
-        bitmapFrameUpdate(globalTmp);
+        globalMat = matImageSelector();
+
+        Imgproc.cvtColor(globalMat, globalMat, Imgproc.COLOR_RGB2GRAY);
+        Imgproc.adaptiveThreshold(globalMat, globalMat, 255, Imgproc.ADAPTIVE_THRESH_GAUSSIAN_C, Imgproc.THRESH_BINARY, 15, 2);
+
+        bitmapFrameUpdate(globalMat);
     }
 
 
