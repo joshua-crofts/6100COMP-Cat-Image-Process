@@ -48,7 +48,7 @@ public class ImageCropActivity extends AppCompatActivity {
 
         //assigning the objects to the layout
         imgCrop = findViewById(R.id.imageIn);
-        cropBtn = findViewById(R.id.cropBtn);
+        cropBtn = findViewById(R.id.exitBtn);
         nextPageBtn = findViewById(R.id.nextPageBtn);
 
         //setBitmap();

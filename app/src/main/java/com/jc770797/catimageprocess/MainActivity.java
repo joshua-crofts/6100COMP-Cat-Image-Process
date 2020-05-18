@@ -34,9 +34,8 @@ public class MainActivity extends AppCompatActivity {
         enterBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 startActivity(new Intent( MainActivity.this, ImageSelectionActivity.class));
-
+                //startActivity(new Intent( MainActivity.this, ImageResultsActivity.class));
             }
         });
 

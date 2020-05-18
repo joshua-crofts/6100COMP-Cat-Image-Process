@@ -15,8 +15,13 @@ public class Snake {
     private boolean type;
     private String input;
     private int numPoint = 0;
-    private int[][] pointArray = new int[200][2];
 
+    public int[][] getPointArray() {
+        return pointArray;
+    }
+
+    private int[][] pointArray = new int[200][2];
+    private KassSnake kSnake;
 
     public Snake(Bitmap img, boolean type, String input) {
         this.img = img;
@@ -48,7 +53,7 @@ public class Snake {
             double itterations = 500;
 
 
-            KassSnake kSnake = new KassSnake(img,pointArray, alpha, beta, delta ,sigma ,itterations, numPoint);
+            kSnake = new KassSnake(img,pointArray, alpha, beta, delta ,sigma ,itterations, numPoint);
             kSnake.start();
         }else{
 
@@ -62,6 +67,11 @@ public class Snake {
             Log.d("DEBUG_TEST", "Point: " +numPoint +"(X:" +  pointArray[numPoint][0] + ")(Y: " + pointArray[numPoint][1] + ")");
         }
 
+    }
+
+
+    public Bitmap getImg() {
+        return kSnake.returnImage();
     }
 
     public int getNumPoints() {

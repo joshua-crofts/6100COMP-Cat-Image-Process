@@ -4,21 +4,19 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.util.Log;
 
+import com.jc770797.catimageprocess.fragments.SnakeOverlayMainFragment;
+
 import org.opencv.android.Utils;
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
-import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.DoubleSummaryStatistics;
+import java.nio.IntBuffer;
 
 public class KassSnake {
 
-    private Bitmap img;
+    private Bitmap img, test;
     private int[][] pointArray;
     private double alpha;
     private double beta;
@@ -60,19 +58,88 @@ public class KassSnake {
 
         for (int i = 0; i < energyArray.length; i++) {
             for (int j = 0; j < energyArray[i].length; j++) {
-                if(energyArray[j][i] < maxArrayEnrg){
-                    maxArrayEnrg = energyArray[j][i];
-                }else if(energyArray[j][i] > minArrayEnrg){
-                    minArrayEnrg = energyArray[j][i];
+                if(energyArray[i][j] < maxArrayEnrg){
+                    maxArrayEnrg = energyArray[i][j];
+                }else if(energyArray[i][j] > minArrayEnrg){
+                    minArrayEnrg = energyArray[i][j];
                 }
 
 
             }
         }
 
+        //normalize image energy
+        //enrgImg = (enrgImg - minEnrgImg)/(maxEnrgImg - minEnrgImg) * (0 - (-1)) + (-1);
+        for (int i = 0; i < energyArray.length; i++) {
+            for (int j = 0; j < energyArray[i].length; j++) {
+                energyArray[i][j] = (energyArray[i][j] - maxArrayEnrg)/(minArrayEnrg-maxArrayEnrg);
+                //Log.d("DEBUG_TEST", "Val: " + energyArray[i][j] );
+            }
+        }
+
+
+        test = Bitmap.createBitmap(energyArray.length, energyArray[1].length, Bitmap.Config.ARGB_8888);
+        for (int i = 0; i < energyArray.length; i++) {
+            for (int j = 0; j < energyArray[i].length; j++) {
+                //Log.d("DEBUG_TEST", "Val: " + energyArray[i][j] * 1000);
+                double out1 =  energyArray[i][j];
+                int out = (int) (out1* 1000);
+                //Log.d("DEBUG_TEST", "Val: " + out );
+                int colOut = Color.argb(255, out , out,out);
+                test.setPixel(i,j, colOut );
+            }
+        }
+
+        double dervX[][] = getDerivatives();
+        double dervY[][] = getDerivatives();
+
+        //Initialise the alpha&beta on the points
+        int h = 1;
+
+        //create a matrix using the contructA method
+        double exampleArray[][] = arrayConstruct();
+
+        //inversion of matrix
+
+        snakeIterate();
+
+    }
+
+    private void snakeIterate () {
+
+        for (int i = 0; i < maxIter; i++) {
+            //change this statement to alter iteration counter
+                if((i % 15) == 0){
+                    snakeResample();
+                }
+
+            double energyX = 0;//interpolation here
+            double energyY = 0;//interpolation here
 
 
 
+
+
+        }
+    }
+
+    private void snakeResample() {
+        //alter the snake image to move the objects
+    }
+
+    private double[][] arrayConstruct() {
+       double testArray[][] = new double[1][1];
+
+        return testArray;
+    }
+
+    private double[][] getDerivatives() {
+      double arrayOut[][] = new double[1][1];
+
+
+
+
+        return arrayOut;
     }
 
     /**
@@ -130,5 +197,9 @@ public class KassSnake {
 
 
         return energyArray;
+    }
+
+    public Bitmap returnImage(){
+        return test;
     }
 }

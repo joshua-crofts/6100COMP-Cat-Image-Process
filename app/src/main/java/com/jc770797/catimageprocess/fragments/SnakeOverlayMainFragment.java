@@ -1,5 +1,6 @@
 package com.jc770797.catimageprocess.fragments;
 
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,7 +17,7 @@ import com.jc770797.catimageprocess.R;
 public class SnakeOverlayMainFragment extends Fragment {
 
     private ImageView mainImage;
-    private Button pointsBtn, snakeStartBtn;
+    private Button pointsBtn, snakeStartBtn, testBtn;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -40,7 +41,7 @@ public class SnakeOverlayMainFragment extends Fragment {
         pointsBtn = getView().findViewById(R.id.pointsBtn);
         snakeStartBtn = getView().findViewById(R.id.snakeStartBtn);
 
-
+        testBtn = getView().findViewById(R.id.testBtn);
         buttonListener();
     }
 
@@ -59,11 +60,22 @@ public class SnakeOverlayMainFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 //start snake here
-                snakeStart();
+               snakeStart();
+
             }
         });
 
+        testBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                testImgSwitch();
+            }
+        });
 
+    }
+
+    private void testImgSwitch() {
+        switchImage(((ImageSnakeActivity)this.getActivity()).snakeGetTestImg());
     }
 
 
@@ -73,6 +85,9 @@ public class SnakeOverlayMainFragment extends Fragment {
        ((ImageSnakeActivity)this.getActivity()).fragmentChange();
     }
 
+    public void switchImage(Bitmap imgIn){
+        mainImage.setImageBitmap(imgIn);
+    }
 
 
 }

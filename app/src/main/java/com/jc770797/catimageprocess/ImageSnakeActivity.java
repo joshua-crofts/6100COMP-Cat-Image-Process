@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.icu.util.BuddhistCalendar;
 import android.os.Bundle;
 
 import android.view.View;
@@ -33,7 +34,7 @@ public class ImageSnakeActivity extends AppCompatActivity {
     private Button continueBtn;
     private TextView pointerCount;
     private FragmentManager frm;
-    private  FragmentTransaction fragmentTransaction;
+    private FragmentTransaction fragmentTransaction;
     private Fragment mainOverlay = new SnakeOverlayMainFragment();
     private Snake snake;
 
@@ -67,6 +68,18 @@ public class ImageSnakeActivity extends AppCompatActivity {
         Bitmap.Config config = Bitmap.Config.ARGB_8888;
         overlayImage = Bitmap.createBitmap(greyImageMap.getWidth(),greyImageMap.getHeight(),config);
 
+
+        continueBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Bundle b = new Bundle();
+                Intent intent = new Intent(ImageSnakeActivity.this, ImageResultsActivity.class);
+                b.putSerializable("Array", snake.getPointArray());
+                b.putInt("numPoint", snake.getNumPoints());
+                intent.putExtras(b);
+                startActivity(intent);
+            }
+        });
     }
 
     public void fragmentChange(){
@@ -116,7 +129,9 @@ public class ImageSnakeActivity extends AppCompatActivity {
     public void snakeStart(){
         snake.start(this);
     }
-
+    public Bitmap snakeGetTestImg(){
+        return snake.getImg();
+    }
     private void fileGetter(){
         String tempFilename = getIntent().getStringExtra("image");
         try {
