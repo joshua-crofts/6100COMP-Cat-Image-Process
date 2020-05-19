@@ -9,49 +9,54 @@
 
     <ImageView
         android:id="@+id/imageIn"
-        android:layout_width="225dp"
-        android:layout_height="225dp"
+        android:layout_width="321dp"
+        android:layout_height="240dp"
         android:layout_marginStart="32dp"
-        android:layout_marginLeft="32dp"
-        android:layout_marginTop="32dp"
+        android:layout_marginTop="24dp"
         android:layout_marginEnd="32dp"
-        android:layout_marginRight="32dp"
-        android:scaleType="fitStart"
-        app:layout_constraintDimensionRatio="1:1"
+        android:layout_marginBottom="16dp"
+        app:layout_constraintBottom_toTopOf="@+id/morphSpinner"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.16000003"
         app:srcCompat="@android:color/darker_gray" />
 
     <Button
-        android:id="@+id/applyBtn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="64dp"
-        android:text="Apply Changes"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-
-    <Button
-        android:id="@+id/continueBtn2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:id="@+id/nextPageBtn"
+        android:layout_width="206dp"
+        android:layout_height="63dp"
         android:layout_marginBottom="16dp"
         android:text="@string/continue_button"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.502"
         app:layout_constraintStart_toStartOf="parent" />
+
+    <Button
+        android:id="@+id/applyBtn"
+        android:layout_width="130dp"
+        android:layout_height="wrap_content"
+        android:text="Apply"
+        app:layout_constraintBottom_toTopOf="@+id/nextPageBtn"
+        app:layout_constraintEnd_toStartOf="@+id/applyBaseBtn"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <Button
+        android:id="@+id/applyBaseBtn"
+        android:layout_width="130dp"
+        android:layout_height="47dp"
+        android:text="Reset Image"
+        app:layout_constraintBottom_toTopOf="@+id/nextPageBtn"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.58"
+        app:layout_constraintStart_toEndOf="@+id/applyBtn" />
 
     <Spinner
         android:id="@+id/morphSpinner"
         android:layout_width="333dp"
         android:layout_height="27dp"
         android:layout_marginStart="32dp"
-        android:layout_marginLeft="32dp"
         android:layout_marginEnd="32dp"
-        android:layout_marginRight="32dp"
         android:entries="@array/drop_down_opt_morph"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

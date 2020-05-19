@@ -2,12 +2,13 @@ package com.jc770797.catimageprocess.activeCont;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.Point;
 import android.util.Log;
 import android.widget.Toast;
 
-import org.opencv.android.Utils;
-import org.opencv.core.CvType;
-import org.opencv.core.Mat;
+
+
+import java.util.ArrayList;
 
 
 public class Snake {
@@ -16,11 +17,11 @@ public class Snake {
     private String input;
     private int numPoint = 0;
 
-    public int[][] getPointArray() {
+    public ArrayList<Point> getPointArray() {
         return pointArray;
     }
-
-    private int[][] pointArray = new int[200][2];
+    private ArrayList<Point> pointArray= new ArrayList<>();
+    //private int[][] pointArray = new int[200][2];
     private KassSnake kSnake;
 
     public Snake(Bitmap img, boolean type, String input) {
@@ -31,8 +32,9 @@ public class Snake {
 
 
     public void createPoint(int x, int y){
-            pointArray[numPoint][0] = x;
-            pointArray[numPoint][1] = y;
+        Point point = new Point(x,y);
+        pointArray.add(point);//            pointArray[numPoint][0] = x;
+//            pointArray[numPoint][1] = y;
             numPoint++;
     }
 
@@ -64,7 +66,7 @@ public class Snake {
 
     public void printPoints(){
         for(int i = 0; i < numPoint; i++){
-            Log.d("DEBUG_TEST", "Point: " +numPoint +"(X:" +  pointArray[numPoint][0] + ")(Y: " + pointArray[numPoint][1] + ")");
+            Log.d("DEBUG_TEST", "Point: " +numPoint +"(X:" +  pointArray.get(i).x + ")(Y: " + pointArray.get(i).y + ")");
         }
 
     }

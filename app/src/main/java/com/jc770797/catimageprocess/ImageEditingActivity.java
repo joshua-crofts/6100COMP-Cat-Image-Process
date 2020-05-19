@@ -31,7 +31,7 @@ import java.io.IOException;
 public class ImageEditingActivity extends AppCompatActivity {
 
     //Image objects
-    public Bitmap colourImageMap ;//= ImageCropActivity.getBitmap()
+    public Bitmap colourImageMap;
     public  Bitmap greyImageMap, baseGreyImage;
     private ImageView imgSelect;
 
@@ -50,14 +50,10 @@ public class ImageEditingActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_image_edit);
-
         fileGetter();
 
         //set the grey image map
         greyImageMap = Bitmap.createBitmap(colourImageMap.getWidth(), colourImageMap.getHeight(), colourImageMap.getConfig());
-
-
-
 
         //assigning the objects to the layout
         imgSelect = findViewById(R.id.imageIn);

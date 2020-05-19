@@ -26,8 +26,8 @@ import java.io.IOException;
 
 public class ImageMorphological extends AppCompatActivity {
 
-    public  Bitmap greyImageMap ;
-    private Button nextPageBtn, applyBtn;
+    public  Bitmap greyImageMap ,baseGreyImage;
+    private Button nextPageBtn, applyBtn, resetBtn;
     private ImageView imgSelect;
     private Spinner spinner;
     private SeekBar kernelSeekBar;
@@ -44,14 +44,12 @@ public class ImageMorphological extends AppCompatActivity {
         fileGetter();
         imgSelect = findViewById(R.id.imageIn);
         imgSelect.setImageBitmap(greyImageMap);
+        baseGreyImage = greyImageMap.copy(greyImageMap.getConfig(), true);
 
-
-
-
-
-        nextPageListener();
+        buttonListener();
         spinnerListener();
         seekBarListener();
+
     }
 
     protected void onStart(){
@@ -59,9 +57,9 @@ public class ImageMorphological extends AppCompatActivity {
         fileGetter();
         imgSelect.setImageBitmap(greyImageMap);
     }
-    private void nextPageListener() {
-        nextPageBtn = findViewById(R.id.continueBtn2);
-
+    private void buttonListener() {
+        nextPageBtn = findViewById(R.id.nextPageBtn);
+        resetBtn = findViewById(R.id.applyBaseBtn);
         nextPageBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -77,6 +75,12 @@ public class ImageMorphological extends AppCompatActivity {
                 }catch(Exception e){
                     e.printStackTrace();
                 }
+            }
+        });
+        resetBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                resetImage();
             }
         });
     }
@@ -198,7 +202,10 @@ public class ImageMorphological extends AppCompatActivity {
         bitmapFrameUpdate(tmp);
     }
 
-
+    /*
+        Various methods for changing the image type
+        or outputting and storing the image.
+         */
     private void bitmapFrameUpdate(Mat matIn) {
         Utils.matToBitmap(matIn, greyImageMap);
         imgSelect.setImageBitmap(greyImageMap);
@@ -221,6 +228,12 @@ public class ImageMorphological extends AppCompatActivity {
         }
 
     }
+
+    private void resetImage(){
+        greyImageMap = baseGreyImage.copy(baseGreyImage.getConfig(),true);
+        imgSelect.setImageBitmap(greyImageMap);
+    }
+
     private void fileWriter(String tempFilename) throws IOException {
 
         FileOutputStream stream = ImageMorphological.this.openFileOutput(tempFilename, Context.MODE_PRIVATE);

@@ -72,7 +72,8 @@ public class ImageCropActivity extends AppCompatActivity {
                     //imageMap.recycle();
 
                     //Create the intent and add the filename to it
-                    Intent intent = new Intent(ImageCropActivity.this, ImageEditingActivity.class);
+                    //Intent intent = new Intent(ImageCropActivity.this, ImageEditingActivity.class);
+                    Intent intent = new Intent(ImageCropActivity.this, ImageSnakeActivity.class); // testing remove me
                     intent.putExtra("image", tempFilename);
                     startActivity(intent);
                 }catch(Exception e){

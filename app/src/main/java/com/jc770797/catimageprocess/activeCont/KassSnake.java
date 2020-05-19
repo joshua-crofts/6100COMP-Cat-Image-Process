@@ -2,6 +2,7 @@ package com.jc770797.catimageprocess.activeCont;
 
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.Point;
 import android.util.Log;
 
 import com.jc770797.catimageprocess.fragments.SnakeOverlayMainFragment;
@@ -13,11 +14,13 @@ import org.opencv.core.Mat;
 import org.opencv.imgproc.Imgproc;
 
 import java.nio.IntBuffer;
+import java.util.ArrayList;
 
 public class KassSnake {
 
     private Bitmap img, test;
-    private int[][] pointArray;
+    private ArrayList<Point> pointArray ;
+   // private int[][] pointArray;
     private double alpha;
     private double beta;
     private double delta;
@@ -36,7 +39,7 @@ public class KassSnake {
      * @param maxItter The max number of itterations
      * @param numPoints number of snake points
      */
-    public KassSnake(Bitmap img,int[][] pointArray, double alpha, double beta, double delta, double sigma, double maxItter, int numPoints) {
+    public KassSnake(Bitmap img,ArrayList<Point>  pointArray, double alpha, double beta, double delta, double sigma, double maxItter, int numPoints) {
         this.img = img;
         this.pointArray = pointArray;
         this.alpha = alpha;
@@ -68,12 +71,9 @@ public class KassSnake {
             }
         }
 
-        //normalize image energy
-        //enrgImg = (enrgImg - minEnrgImg)/(maxEnrgImg - minEnrgImg) * (0 - (-1)) + (-1);
         for (int i = 0; i < energyArray.length; i++) {
             for (int j = 0; j < energyArray[i].length; j++) {
                 energyArray[i][j] = (energyArray[i][j] - maxArrayEnrg)/(minArrayEnrg-maxArrayEnrg);
-                //Log.d("DEBUG_TEST", "Val: " + energyArray[i][j] );
             }
         }
 
@@ -174,7 +174,6 @@ public class KassSnake {
         Core.convertScaleAbs(grad_y,abs_grad_y);
 
         Core.addWeighted(abs_grad_x,0.5,abs_grad_y, 0.5, 0, outPut);
-
 
         if(inverted){
             Core.bitwise_not(outPut,outPut);

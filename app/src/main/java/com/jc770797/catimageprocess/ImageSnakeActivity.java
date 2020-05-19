@@ -1,16 +1,17 @@
 package com.jc770797.catimageprocess;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
 import android.graphics.Color;
-import android.icu.util.BuddhistCalendar;
+import android.graphics.Paint;
+import android.graphics.Path;
+import android.graphics.Point;
 import android.os.Bundle;
 
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 
@@ -18,13 +19,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
-import androidx.viewpager2.widget.ViewPager2;
 
 import com.jc770797.catimageprocess.activeCont.Snake;
 import com.jc770797.catimageprocess.fragments.SnakeOverlayMainFragment;
 import com.jc770797.catimageprocess.fragments.SnakeOverlayPointsFragment;
 
 import java.io.FileInputStream;
+import java.util.ArrayList;
 
 
 public class ImageSnakeActivity extends AppCompatActivity {
@@ -37,7 +38,7 @@ public class ImageSnakeActivity extends AppCompatActivity {
     private FragmentTransaction fragmentTransaction;
     private Fragment mainOverlay = new SnakeOverlayMainFragment();
     private Snake snake;
-
+    boolean snakeBool = false, addPointsBool=true;
 
     public Bitmap getImage(){
         return this.greyImageMap;
@@ -58,7 +59,7 @@ public class ImageSnakeActivity extends AppCompatActivity {
         frm = getSupportFragmentManager();
         fragmentTransaction = frm.beginTransaction();
         fragmentTransaction.replace(R.id.fragmentHolder, mainOverlay);
-        fragmentTransaction.addToBackStack(null);
+        fragmentTransaction.disallowAddToBackStack();
         fragmentTransaction.commit();
 
         snake = new Snake(greyImageMap,true, "Kass");
@@ -86,46 +87,37 @@ public class ImageSnakeActivity extends AppCompatActivity {
         Fragment pointsOverlay = new SnakeOverlayPointsFragment();
         fragmentTransaction = frm.beginTransaction();
         fragmentTransaction.replace(R.id.fragmentHolder, pointsOverlay);
-        fragmentTransaction.addToBackStack(null);
+        fragmentTransaction.disallowAddToBackStack();
         fragmentTransaction.commit();
     }
     public void fragmentChange2(){
         pointerCount.setText("Number of points: " + snake.getNumPoints());
-
         fragmentTransaction = frm.beginTransaction();
         fragmentTransaction.replace(R.id.fragmentHolder, mainOverlay);
-        fragmentTransaction.addToBackStack(null);
+        fragmentTransaction.disallowAddToBackStack();
         fragmentTransaction.commit();
 
     }
 
+
     public void pointAdder(int x, int y){
         snake.createPoint(x,y);
-        try {
-            overlayImage.setPixel(x-2,y, Color.RED);
-            overlayImage.setPixel(x,y+2, Color.RED);
 
-            overlayImage.setPixel(x-1,y-1, Color.RED);
-            overlayImage.setPixel(x-1,y+1, Color.RED);
+        Canvas canvas = new Canvas(overlayImage);
 
-            overlayImage.setPixel(x-1,y, Color.RED);
-            overlayImage.setPixel(x,y+1, Color.RED);
-            overlayImage.setPixel(x,y, Color.RED);
-            overlayImage.setPixel(x,y-1, Color.RED);
-            overlayImage.setPixel(x+1,y, Color.RED);
+        Paint paint = new Paint();
+        paint.setColor(Color.RED);
+        paint.setStrokeWidth(2);
 
-            overlayImage.setPixel(x+1,y-1, Color.RED);
-            overlayImage.setPixel(x+1,y+1, Color.RED);
+        canvas.drawCircle(x, y, 5,paint);
 
-            overlayImage.setPixel(x,y-2, Color.RED);
-            overlayImage.setPixel(x+2,y, Color.RED);
-        }catch (Exception e){
-
-        }
 
 
     }
-
+    public ArrayList<Point> getPointArray(){
+        return snake.getPointArray();
+    }
+    public int getPointNum(){return snake.getNumPoints();}
     public void snakeStart(){
         snake.start(this);
     }
