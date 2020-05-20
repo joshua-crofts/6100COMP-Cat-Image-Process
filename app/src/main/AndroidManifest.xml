@@ -32,6 +32,10 @@
             android:label="Image Selection"
             android:screenOrientation="portrait" />
         <activity
+            android:name=".ResultListActivity"
+            android:label="Results"
+            android:screenOrientation="portrait" />
+        <activity
             android:name=".ImageCropActivity"
             android:label="Image Crop"
             android:screenOrientation="portrait" />

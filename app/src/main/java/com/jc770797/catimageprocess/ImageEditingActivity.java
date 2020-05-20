@@ -51,14 +51,11 @@ public class ImageEditingActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_image_edit);
         fileGetter();
-
         //set the grey image map
         greyImageMap = Bitmap.createBitmap(colourImageMap.getWidth(), colourImageMap.getHeight(), colourImageMap.getConfig());
-
         //assigning the objects to the layout
         imgSelect = findViewById(R.id.imageIn);
         imgSelect.setImageBitmap(colourImageMap);
-
         //main calls
         nextPageListener();
         filterGreyScale();
@@ -82,7 +79,6 @@ public class ImageEditingActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 try{
-
                     //Write the file to storage
                     String tempFilename = "catPr_bitmap.png";
                     fileWriter(tempFilename);
@@ -101,11 +97,8 @@ public class ImageEditingActivity extends AppCompatActivity {
 
     //additional button/spinner listeners
     private void buttonListeners() {
-
         spinner = findViewById(R.id.spinner);
         Button  applyBtn, resetImgBtn;
-
-
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -141,8 +134,6 @@ public class ImageEditingActivity extends AppCompatActivity {
             public void onNothingSelected(AdapterView<?> parent) {
             }
         });
-
-
         applyBtn = findViewById(R.id.applyBtn);
         resetImgBtn = findViewById(R.id.applyBaseBtn);
         applyBtn.setOnClickListener(new View.OnClickListener() {
@@ -157,8 +148,6 @@ public class ImageEditingActivity extends AppCompatActivity {
                 resetImage();
             }
         });
-
-
     }
 
 
@@ -200,12 +189,10 @@ public class ImageEditingActivity extends AppCompatActivity {
 
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
-
             }
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-
             }
         });
     }
@@ -266,7 +253,6 @@ public class ImageEditingActivity extends AppCompatActivity {
         bitmapFrameUpdate(outPut);
     }
 
-
     /*
     Separate methods for editing the grey image map
     Each using openCV functions
@@ -303,23 +289,17 @@ public class ImageEditingActivity extends AppCompatActivity {
 
     private void filterThreshold() {
         globalMat = matImageSelector();
-
         Imgproc.cvtColor(globalMat, globalMat, Imgproc.COLOR_RGB2GRAY);
         Imgproc.threshold(globalMat, globalMat, threshold, 255, 0);
-
         bitmapFrameUpdate(globalMat);
     }
 
     private void adaptiveThreshold() {
         globalMat = matImageSelector();
-
         Imgproc.cvtColor(globalMat, globalMat, Imgproc.COLOR_RGB2GRAY);
         Imgproc.adaptiveThreshold(globalMat, globalMat, 255, Imgproc.ADAPTIVE_THRESH_GAUSSIAN_C, Imgproc.THRESH_BINARY, 15, 2);
-
         bitmapFrameUpdate(globalMat);
     }
-
-
 
     /*
     Various methods for changing the image type
@@ -354,7 +334,6 @@ public class ImageEditingActivity extends AppCompatActivity {
     }
 
     private void fileWriter(String tempFilename) throws IOException {
-
         FileOutputStream stream = ImageEditingActivity.this.openFileOutput(tempFilename, Context.MODE_PRIVATE);
         greyImageMap.compress(Bitmap.CompressFormat.PNG, 100, stream);
         //Close the steam

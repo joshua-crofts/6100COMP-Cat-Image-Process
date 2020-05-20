@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.fragment.app.Fragment;
 
@@ -25,6 +26,7 @@ public class SnakeOverlayMainFragment extends Fragment {
     private ImageView mainImage, overlayImage;
     private Button pointsBtn, snakeStartBtn, testBtn;
     private ArrayList<Point> pointArray;
+    private TextView pointerCount;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -43,6 +45,12 @@ public class SnakeOverlayMainFragment extends Fragment {
         mainImage.setImageBitmap(((ImageSnakeActivity) this.getActivity()).getImage());
         overlayImage = getView().findViewById(R.id.imageViewSnakeOverlay);
 
+        pointerCount = getView().findViewById(R.id.numOfPoints);
+        try {
+            pointerCount.setText("Number of points: " + ((ImageSnakeActivity) this.getActivity()).getPointNum());
+        } catch (Exception e) {
+            pointerCount.setText("Number of points: 0");
+        }
 
         pointsBtn = getView().findViewById(R.id.pointsBtn);
         snakeStartBtn = getView().findViewById(R.id.snakeStartBtn);
@@ -52,11 +60,10 @@ public class SnakeOverlayMainFragment extends Fragment {
             pointsBtn.setEnabled(true);
         } else {
             overlayImage.setImageBitmap(((ImageSnakeActivity) this.getActivity()).getOverlayImageImage());
-            pointArray  = ((ImageSnakeActivity) this.getActivity()).getPointArray();
+            pointArray = ((ImageSnakeActivity) this.getActivity()).getPointArray();
             snakeStartBtn.setEnabled(true);
             pointsBtn.setEnabled(false);
         }
-
         testBtn = getView().findViewById(R.id.testBtn);
         buttonListener();
     }
@@ -69,7 +76,6 @@ public class SnakeOverlayMainFragment extends Fragment {
                                          }
                                      }
         );
-
         snakeStartBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -77,16 +83,13 @@ public class SnakeOverlayMainFragment extends Fragment {
                 snakeStart();
             }
         });
-
         testBtn.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View v) {
                 splineTest();
-                //testImgSwitch();
             }
         });
-
     }
 
     private void splineTest() {
@@ -98,10 +101,10 @@ public class SnakeOverlayMainFragment extends Fragment {
         Path path = new Path();
 
         path.moveTo(pointArray.get(0).x, pointArray.get(0).y);
-        for (int i = 0; i < pointArray.size() -1; i++) {
-            if(i != pointArray.size()){
-                path.quadTo(pointArray.get(i).x, pointArray.get(i).y, pointArray.get(i +1).x, pointArray.get(i + 1).y);
-            }else{
+        for (int i = 0; i < pointArray.size() - 1; i++) {
+            if (i != pointArray.size()) {
+                path.quadTo(pointArray.get(i).x, pointArray.get(i).y, pointArray.get(i + 1).x, pointArray.get(i + 1).y);
+            } else {
                 path.quadTo(pointArray.get(i).x, pointArray.get(i).y, pointArray.get(0).x, pointArray.get(0).y);
                 path.close();
             }
@@ -115,9 +118,8 @@ public class SnakeOverlayMainFragment extends Fragment {
     }
 
     private void testImgSwitch() {
-        switchImage(((ImageSnakeActivity) this.getActivity()).snakeGetTestImg());
+        switchImage(((ImageSnakeActivity) this.getActivity()).getTestImg());
     }
-
 
     private void snakeStart() {
         ((ImageSnakeActivity) this.getActivity()).snakeStart();
@@ -129,11 +131,6 @@ public class SnakeOverlayMainFragment extends Fragment {
 
     public void switchImage(Bitmap imgIn) {
         mainImage.setImageBitmap(imgIn);
-    }
-
-    public void buttonSwitch() {
-        snakeStartBtn.setEnabled(true);
-        pointsBtn.setEnabled(false);
     }
 
 }

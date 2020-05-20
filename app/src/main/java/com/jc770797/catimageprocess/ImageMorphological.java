@@ -26,7 +26,7 @@ import java.io.IOException;
 
 public class ImageMorphological extends AppCompatActivity {
 
-    public  Bitmap greyImageMap ,baseGreyImage;
+    public Bitmap greyImageMap, baseGreyImage;
     private Button nextPageBtn, applyBtn, resetBtn;
     private ImageView imgSelect;
     private Spinner spinner;
@@ -40,30 +40,28 @@ public class ImageMorphological extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_image_morph);
-
         fileGetter();
         imgSelect = findViewById(R.id.imageIn);
         imgSelect.setImageBitmap(greyImageMap);
         baseGreyImage = greyImageMap.copy(greyImageMap.getConfig(), true);
-
         buttonListener();
         spinnerListener();
         seekBarListener();
-
     }
 
-    protected void onStart(){
+    protected void onStart() {
         super.onStart();
         fileGetter();
         imgSelect.setImageBitmap(greyImageMap);
     }
+
     private void buttonListener() {
         nextPageBtn = findViewById(R.id.nextPageBtn);
         resetBtn = findViewById(R.id.applyBaseBtn);
         nextPageBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                try{
+                try {
                     //Write the file to storage
                     String tempFilename = "catPr_bitmap.png";
                     fileWriter(tempFilename);
@@ -72,7 +70,7 @@ public class ImageMorphological extends AppCompatActivity {
                     Intent intent = new Intent(ImageMorphological.this, ImageSnakeActivity.class);
                     intent.putExtra("image", tempFilename);
                     startActivity(intent);
-                }catch(Exception e){
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
@@ -130,27 +128,24 @@ public class ImageMorphological extends AppCompatActivity {
         }
     }
 
-    private void seekBarListener(){
+    private void seekBarListener() {
         kernelSeekBar = findViewById(R.id.seekBarKernel);
         KernelSizeTextView = findViewById(R.id.seekBarKernelText);
         KernelSizeTextView.setText("Kernel Size: " + 1);
         kernelSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-
-                if(i == 0) i = 1;
+                if (i == 0) i = 1;
                 KernelSizeTextView.setText("Kernel Size: " + i);
                 kernelSize = i;
             }
 
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
-
             }
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-
             }
         });
     }
@@ -159,46 +154,48 @@ public class ImageMorphological extends AppCompatActivity {
     private void filterMorphologicalOpen() {
         globalTmp = matImageSelector();
         Mat tmp = new Mat();
-        Mat kernel = Mat.ones(kernelSize,kernelSize, CvType.CV_32F);
-        Imgproc.morphologyEx(globalTmp,tmp, Imgproc.MORPH_OPEN, kernel);
+        Mat kernel = Mat.ones(kernelSize, kernelSize, CvType.CV_32F);
+        Imgproc.morphologyEx(globalTmp, tmp, Imgproc.MORPH_OPEN, kernel);
         bitmapFrameUpdate(tmp);
     }
 
     private void filterMorphologicalClose() {
         globalTmp = matImageSelector();
         Mat tmp = new Mat();
-        Mat kernel = Mat.ones(kernelSize,kernelSize, CvType.CV_32F);
-        Imgproc.morphologyEx(globalTmp,tmp, Imgproc.MORPH_CLOSE, kernel);
+        Mat kernel = Mat.ones(kernelSize, kernelSize, CvType.CV_32F);
+        Imgproc.morphologyEx(globalTmp, tmp, Imgproc.MORPH_CLOSE, kernel);
         bitmapFrameUpdate(tmp);
     }
+
     private void filterMorphologicalErode() {
         globalTmp = matImageSelector();
         Mat tmp = new Mat();
-        Mat kernel = Mat.ones(kernelSize,kernelSize, CvType.CV_32F);
-        Imgproc.morphologyEx(globalTmp,tmp, Imgproc.MORPH_ERODE, kernel);
+        Mat kernel = Mat.ones(kernelSize, kernelSize, CvType.CV_32F);
+        Imgproc.morphologyEx(globalTmp, tmp, Imgproc.MORPH_ERODE, kernel);
         bitmapFrameUpdate(tmp);
     }
+
     private void filterMorphologicalDilate() {
         globalTmp = matImageSelector();
         Mat tmp = new Mat();
-        Mat kernel = Mat.ones(kernelSize,kernelSize, CvType.CV_32F);
-        Imgproc.morphologyEx(globalTmp,tmp, Imgproc.MORPH_DILATE, kernel);
+        Mat kernel = Mat.ones(kernelSize, kernelSize, CvType.CV_32F);
+        Imgproc.morphologyEx(globalTmp, tmp, Imgproc.MORPH_DILATE, kernel);
         bitmapFrameUpdate(tmp);
     }
 
     private void filterMorphologicalEclipse() {
         globalTmp = matImageSelector();
         Mat tmp = new Mat();
-        Mat kernel = Mat.ones(kernelSize,kernelSize, CvType.CV_32F);
-        Imgproc.morphologyEx(globalTmp,tmp, Imgproc.MORPH_ELLIPSE, kernel);
+        Mat kernel = Mat.ones(kernelSize, kernelSize, CvType.CV_32F);
+        Imgproc.morphologyEx(globalTmp, tmp, Imgproc.MORPH_ELLIPSE, kernel);
         bitmapFrameUpdate(tmp);
     }
 
     private void filterMorphologicalRect() {
         globalTmp = matImageSelector();
         Mat tmp = new Mat();
-        Mat kernel = Mat.ones(kernelSize,kernelSize, CvType.CV_32F);
-        Imgproc.morphologyEx(globalTmp,tmp, Imgproc.MORPH_RECT, kernel);
+        Mat kernel = Mat.ones(kernelSize, kernelSize, CvType.CV_32F);
+        Imgproc.morphologyEx(globalTmp, tmp, Imgproc.MORPH_RECT, kernel);
         bitmapFrameUpdate(tmp);
     }
 
@@ -217,25 +214,24 @@ public class ImageMorphological extends AppCompatActivity {
         return tmpOut;
     }
 
-    private void fileGetter(){
+    private void fileGetter() {
         String tempFilename = getIntent().getStringExtra("image");
         try {
             FileInputStream is = ImageMorphological.this.openFileInput(tempFilename);
             greyImageMap = BitmapFactory.decodeStream(is);
             is.close();
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
     }
 
-    private void resetImage(){
-        greyImageMap = baseGreyImage.copy(baseGreyImage.getConfig(),true);
+    private void resetImage() {
+        greyImageMap = baseGreyImage.copy(baseGreyImage.getConfig(), true);
         imgSelect.setImageBitmap(greyImageMap);
     }
 
     private void fileWriter(String tempFilename) throws IOException {
-
         FileOutputStream stream = ImageMorphological.this.openFileOutput(tempFilename, Context.MODE_PRIVATE);
         greyImageMap.compress(Bitmap.CompressFormat.PNG, 100, stream);
         //Close the steam

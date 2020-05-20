@@ -12,12 +12,40 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+        <ScrollView
+            android:id="@+id/scrollView3"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginBottom="8dp"
+            app:layout_constraintBottom_toTopOf="@+id/numIteration"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <FrameLayout
+                android:id="@+id/fragmentHolder"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+        </ScrollView>
+
         <TextView
-            android:id="@+id/numOfPoints"
+            android:id="@+id/numIteration"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:text="Number of points: 0"
+            android:scrollbarDefaultDelayBeforeFade="400"
+            android:text="Number of Itterations: 500"
+            app:layout_constraintBottom_toTopOf="@+id/iterationBar"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <SeekBar
+            android:id="@+id/iterationBar"
+            android:layout_width="0dp"
+            android:layout_height="15dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:max="8000"
+            android:progress="500"
             app:layout_constraintBottom_toTopOf="@+id/continueBtn"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
@@ -26,19 +54,12 @@
             android:id="@+id/continueBtn"
             android:layout_width="162dp"
             android:layout_height="60dp"
+            android:layout_marginBottom="8dp"
             android:text="@string/continue_button"
             android:textAppearance="@style/TextAppearance.AppCompat.Display1"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
-
-        <FrameLayout
-            android:id="@+id/fragmentHolder"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

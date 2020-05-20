@@ -86,7 +86,7 @@ public class ImageResultsActivity extends AppCompatActivity {
                 if (exportString != null) {
                     FileOutputStream fileOutputStream = null;
                     try {
-                        fileOutputStream = openFileOutput(FILE_NAME, MODE_PRIVATE);
+                        fileOutputStream = openFileOutput(FILE_NAME, MODE_APPEND);
                         fileOutputStream.write(exportString.getBytes());
                         Toast.makeText(ImageResultsActivity.this, "Saved to: " + getFilesDir() + "/" + FILE_NAME, Toast.LENGTH_LONG).show();
                     }catch (IOException e) {
@@ -112,7 +112,7 @@ public class ImageResultsActivity extends AppCompatActivity {
 
                 for (int i = 0; i < random; i++) {
                     Point point = new Point(new Random().nextInt(3000), new Random().nextInt(3000));
-                    pointArray.set(i, point);
+                    pointArray.add(point);
                 }
                 chartSetup();
             }
@@ -121,7 +121,6 @@ public class ImageResultsActivity extends AppCompatActivity {
 
     private ArrayList<Point> getData() {
         ArrayList<Point> arrayIN, tempArray;
-        //int[][] arrayIN, tempArray;
         int numPoints = 0;
         try {
             Bundle b = getIntent().getExtras();
@@ -172,7 +171,7 @@ public class ImageResultsActivity extends AppCompatActivity {
 
         regressionChart.setChart(chartScatter);
     }
-
+    //this does something
     private double[] setTextValues() {
         double[] linearVals = leastSquare();
 

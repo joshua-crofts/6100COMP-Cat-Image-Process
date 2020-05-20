@@ -18,7 +18,7 @@ import java.io.IOException;
 public class ImageSelectionActivity extends AppCompatActivity {
 
     //Button references
-    Button uploadBtn, nextPageBtn;
+    Button uploadBtn, nextPageBtn, results;
     //Image View
     ImageView imgView;
     //Image holders
@@ -32,7 +32,6 @@ public class ImageSelectionActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_image_selector);
-
         //assigning the objects to the layout
         imgView = findViewById(R.id.imgView);
         buttonListener();
@@ -43,11 +42,10 @@ public class ImageSelectionActivity extends AppCompatActivity {
         //assigning the objects to the layout
         uploadBtn = findViewById(R.id.uploadButton);
         nextPageBtn = findViewById(R.id.continueBtn2);
-
+        results = findViewById(R.id.resultsBtn);
         uploadBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 Intent gallery = new Intent();
                 gallery.setType("image/*");
                 gallery.setAction(Intent.ACTION_GET_CONTENT);
@@ -60,13 +58,10 @@ public class ImageSelectionActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if(imgSelected == true) {
-
                     try{
                         //Write the file to storage
                         String tempFilename = "catPr_bitmap.png";
                         fileWriter(tempFilename);
-
-
                         //Create the intent and add the filename to it
                         Intent intent = new Intent(ImageSelectionActivity.this, ImageCropActivity.class);
                         intent.putExtra("image", tempFilename);
@@ -78,13 +73,16 @@ public class ImageSelectionActivity extends AppCompatActivity {
                 }else{
                     Toast.makeText(ImageSelectionActivity.this,"Please Select an image",Toast.LENGTH_SHORT).show();
                 }
+            }
+        });
 
+                results.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(ImageSelectionActivity.this, ResultListActivity.class));
             }
         });
     }
-
-
-
     //handles image upload and conversion to bitmap.
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
@@ -107,7 +105,6 @@ public class ImageSelectionActivity extends AppCompatActivity {
 
     //Save the image to storage to be called in the next activity
     private void fileWriter(String tempFilename) throws IOException {
-
         FileOutputStream stream = ImageSelectionActivity.this.openFileOutput(tempFilename, Context.MODE_PRIVATE);
         imageMap.compress(Bitmap.CompressFormat.PNG, 100, stream);
         //Close the steam

@@ -22,36 +22,26 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 
 public class ImageCropActivity extends AppCompatActivity {
-
-
     //Button references
     Button cropBtn, nextPageBtn;
     //Image View
     ImageView imgCrop;
-
     //Image holders
-    public  Bitmap imageMap;
+    public Bitmap imageMap;
     public Uri imageUri;
     boolean test = true;
-
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_image_crop);
 
-
         fileGetter();
         imageUri = getIntent().getParcelableExtra("imageUri");
-
         //assigning the objects to the layout
         imgCrop = findViewById(R.id.imageIn);
         cropBtn = findViewById(R.id.exitBtn);
         nextPageBtn = findViewById(R.id.nextPageBtn);
-
-        //setBitmap();
 
         imgCrop.setImageBitmap(imageMap);
         cropBtn.setOnClickListener(new View.OnClickListener() {
@@ -64,50 +54,40 @@ public class ImageCropActivity extends AppCompatActivity {
         nextPageBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
-                try{
+                try {
                     //Write the file to storage
                     String tempFilename = "catPr_bitmap.png";
                     fileWriter(tempFilename);
-                    //imageMap.recycle();
-
                     //Create the intent and add the filename to it
-                    //Intent intent = new Intent(ImageCropActivity.this, ImageEditingActivity.class);
-                    Intent intent = new Intent(ImageCropActivity.this, ImageSnakeActivity.class); // testing remove me
+                    Intent intent = new Intent(ImageCropActivity.this, ImageEditingActivity.class);
                     intent.putExtra("image", tempFilename);
                     startActivity(intent);
-                }catch(Exception e){
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
         });
-
     }
 
     @Override
-    protected void onStart(){
+    protected void onStart() {
         super.onStart();
-        if(test){
-
+        if (test) {
             fileGetter();
             try {
                 imgCrop.setImageBitmap(imageMap);
-            }catch (Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
-
             }
-
-
             imageUri = Uri.fromFile(new File(ImageCropActivity.this.getFilesDir() + "/catPr_bitmap.png"));
             test = true;
         }
     }
 
     //start crop activity view
-    public void startCrop(View v){
+    public void startCrop(View v) {
         CropImage.activity(imageUri).setActivityTitle("Image Crop").setCropShape(CropImageView.CropShape.RECTANGLE).setCropMenuCropButtonTitle("Done")
                 .start(this);
-
     }
 
 
@@ -128,21 +108,19 @@ public class ImageCropActivity extends AppCompatActivity {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-
-
             } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
                 Exception error = result.getError();
             }
         }
     }
 
-    private void fileGetter(){
+    private void fileGetter() {
         String tempFilename = getIntent().getStringExtra("image");
         try {
             FileInputStream is = ImageCropActivity.this.openFileInput(tempFilename);
             imageMap = BitmapFactory.decodeStream(is);
             is.close();
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -151,10 +129,7 @@ public class ImageCropActivity extends AppCompatActivity {
     private void fileWriter(String tempFilename) throws IOException {
         FileOutputStream stream = ImageCropActivity.this.openFileOutput(tempFilename, Context.MODE_PRIVATE);
         imageMap.compress(Bitmap.CompressFormat.PNG, 100, stream);
-
-
         //Close the steam
         stream.close();
     }
-
 }

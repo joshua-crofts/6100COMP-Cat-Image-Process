@@ -5,7 +5,7 @@ import android.graphics.Color;
 import android.graphics.Point;
 import android.util.Log;
 
-import com.jc770797.catimageprocess.fragments.SnakeOverlayMainFragment;
+import com.jc770797.catimageprocess.ImageSnakeActivity;
 
 import org.opencv.android.Utils;
 import org.opencv.core.Core;
@@ -13,19 +13,17 @@ import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.imgproc.Imgproc;
 
-import java.nio.IntBuffer;
 import java.util.ArrayList;
 
-public class KassSnake {
+public class KassSnake extends ImageSnakeActivity{
 
     private Bitmap img, test;
     private ArrayList<Point> pointArray ;
-   // private int[][] pointArray;
     private double alpha;
     private double beta;
     private double delta;
     private double sigma;
-    private double maxIter;
+    private double maxIterations;
 
 
     private int numPoints;
@@ -46,7 +44,7 @@ public class KassSnake {
         this.beta = beta;
         this.delta = delta;
         this.sigma = sigma;
-        this.maxIter = maxItter;
+        this.maxIterations = maxItter;
         this.numPoints = numPoints;
     }
 
@@ -90,8 +88,6 @@ public class KassSnake {
             }
         }
 
-        double dervX[][] = getDerivatives();
-        double dervY[][] = getDerivatives();
 
         //Initialise the alpha&beta on the points
         int h = 1;
@@ -101,23 +97,20 @@ public class KassSnake {
 
         //inversion of matrix
 
-        snakeIterate();
+        beginSnakeRefactor();
 
     }
 
-    private void snakeIterate () {
+    private void beginSnakeRefactor() {
 
-        for (int i = 0; i < maxIter; i++) {
+        for (int i = 0; i < maxIterations; i++) {
             //change this statement to alter iteration counter
                 if((i % 15) == 0){
-                    snakeResample();
+                    super.reSample();
                 }
 
             double energyX = 0;//interpolation here
             double energyY = 0;//interpolation here
-
-
-
 
 
         }
