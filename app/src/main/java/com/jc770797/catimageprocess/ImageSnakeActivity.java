@@ -10,6 +10,7 @@ import android.graphics.Path;
 import android.graphics.Point;
 import android.os.Bundle;
 
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.SeekBar;
@@ -43,6 +44,7 @@ public class ImageSnakeActivity extends AppCompatActivity {
     private SeekBar iterationBar;
 
     private int numPoint = 0;
+    ArrayList<ArrayList> listOfpointers = new ArrayList<>();
     private ArrayList<Point> pointArray = new ArrayList<>();
     private boolean uiSwitch = false;
 
@@ -120,9 +122,12 @@ public class ImageSnakeActivity extends AppCompatActivity {
             double delta = 1;
             double sigma = 3;
             double itterations = iteratorAmount;
+            Log.d("DEBUG_TEST", "Num Itt" + iteratorAmount);
 
+            Log.d("DEBUG_TEST", "Num of Itt" +iteratorAmount);
             kSnake = new KassSnake(greyImageMap, pointArray, alpha, beta, delta, sigma, itterations, numPoint);
-            kSnake.start();
+            listOfpointers = kSnake.start();
+            Toast.makeText(ImageSnakeActivity.this, "Snake Complete", Toast.LENGTH_SHORT).show();
         } else {
 
         }
@@ -162,9 +167,9 @@ public class ImageSnakeActivity extends AppCompatActivity {
         canvas.drawCircle(x, y, 5, paint);
     }
 
-    public void reSample() {
+    public Bitmap reSample() {
         if (pointArray.size() != 0) {
-            Bitmap imageReplace = Bitmap.createBitmap(overlayImage);
+            Bitmap imageReplace = Bitmap.createBitmap(overlayImage.getWidth(), overlayImage.getHeight(), overlayImage.getConfig());
             Canvas canvas = new Canvas(imageReplace);
             Paint paint = new Paint();
             paint.setColor(Color.RED);
@@ -180,18 +185,18 @@ public class ImageSnakeActivity extends AppCompatActivity {
             for (int i = 0; i < pointArray.size(); i++) {
                 if (i < pointArray.size() - 1) {
                     path.quadTo(pointArray.get(i).x, pointArray.get(i).y, pointArray.get(i + 1).x, pointArray.get(i + 1).y);
-                } else {
-                    path.quadTo(pointArray.get(i).x, pointArray.get(i).y, pointArray.get(0).x, pointArray.get(0).y);
                 }
             }
             paint.setStyle(Paint.Style.STROKE);
             canvas.drawPath(path, paint);
             overlayImage = imageReplace;
+            return imageReplace;
         }
+        return overlayImage;
     }
 
     public Bitmap getTestImg() {
-        return kSnake.returnImage();
+        return kSnake.returnTestImage();
     }
 
     private void fileGetter() {
@@ -220,5 +225,13 @@ public class ImageSnakeActivity extends AppCompatActivity {
         numPoint++;
     }
 
+    public void snakePlayback(int i){
+            ArrayList<Point> pointerArray = listOfpointers.get(i);
+            pointArray = pointerArray;
+    }
+
+    public int sizeOfPointerList(){
+        return listOfpointers.size();
+    }
 
 }

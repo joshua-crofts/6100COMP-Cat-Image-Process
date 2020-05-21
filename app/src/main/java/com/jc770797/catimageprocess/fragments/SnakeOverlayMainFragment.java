@@ -87,34 +87,16 @@ public class SnakeOverlayMainFragment extends Fragment {
 
             @Override
             public void onClick(View v) {
-                splineTest();
+
+                //splineTest();
+               // testImgSwitch();
             }
         });
     }
 
     private void splineTest() {
 
-        Canvas spline = new Canvas(((ImageSnakeActivity) this.getActivity()).getOverlayImageImage());
-        Paint paint = new Paint();
-        paint.setColor(Color.BLUE);
-        paint.setStrokeWidth(2);
-        Path path = new Path();
 
-        path.moveTo(pointArray.get(0).x, pointArray.get(0).y);
-        for (int i = 0; i < pointArray.size() - 1; i++) {
-            if (i != pointArray.size()) {
-                path.quadTo(pointArray.get(i).x, pointArray.get(i).y, pointArray.get(i + 1).x, pointArray.get(i + 1).y);
-            } else {
-                path.quadTo(pointArray.get(i).x, pointArray.get(i).y, pointArray.get(0).x, pointArray.get(0).y);
-                path.close();
-            }
-
-
-        }
-        paint.setStyle(Paint.Style.STROKE);
-        spline.drawPath(path, paint);
-
-        overlayImage.setImageBitmap(((ImageSnakeActivity) this.getActivity()).getOverlayImageImage());
     }
 
     private void testImgSwitch() {
@@ -123,6 +105,14 @@ public class SnakeOverlayMainFragment extends Fragment {
 
     private void snakeStart() {
         ((ImageSnakeActivity) this.getActivity()).snakeStart();
+
+        for (int i = 0; i < ( (ImageSnakeActivity) this.getActivity()).sizeOfPointerList(); i++) {
+            ( (ImageSnakeActivity) this.getActivity()).snakePlayback(i);
+            overlayImage.setImageBitmap(( (ImageSnakeActivity) this.getActivity()).reSample());
+        }
+
+
+
     }
 
     private void fragmentSwitch() {

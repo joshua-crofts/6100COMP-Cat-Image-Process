@@ -1,9 +1,7 @@
 package com.jc770797.catimageprocess.activeCont;
 
 import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.graphics.Point;
-import android.util.Log;
 
 import com.jc770797.catimageprocess.ImageSnakeActivity;
 
@@ -13,12 +11,13 @@ import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.imgproc.Imgproc;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 
-public class KassSnake extends ImageSnakeActivity{
+public class KassSnake extends ImageSnakeActivity {
 
     private Bitmap img, test;
-    private ArrayList<Point> pointArray ;
+    private ArrayList<Point> pointArray;
     private double alpha;
     private double beta;
     private double delta;
@@ -27,17 +26,18 @@ public class KassSnake extends ImageSnakeActivity{
 
 
     private int numPoints;
+
     /**
-     * @param img Mat based img
+     * @param img        Bitmap based img
      * @param pointArray The array of points
-     * @param alpha The alpha controlling elasticity
-     * @param beta The beta controlling curvature
-     * @param delta Step size
-     * @param sigma The neighborhood size
-     * @param maxItter The max number of itterations
-     * @param numPoints number of snake points
+     * @param alpha      The alpha controlling elasticity
+     * @param beta       The beta controlling curvature
+     * @param delta      Step size
+     * @param sigma      The neighborhood size
+     * @param maxItter   The max number of itterations
+     * @param numPoints  number of snake points
      */
-    public KassSnake(Bitmap img,ArrayList<Point>  pointArray, double alpha, double beta, double delta, double sigma, double maxItter, int numPoints) {
+    public KassSnake(Bitmap img, ArrayList<Point> pointArray, double alpha, double beta, double delta, double sigma, double maxItter, int numPoints) {
         this.img = img;
         this.pointArray = pointArray;
         this.alpha = alpha;
@@ -48,150 +48,168 @@ public class KassSnake extends ImageSnakeActivity{
         this.numPoints = numPoints;
     }
 
-    public void start() {
+    public ArrayList<ArrayList> start() {
+        Mat energyArray = getImageEnergy(img, true);
 
-    double stopThresh = 0.0008;
-    int stop = 0;
-    int scale = 1;
-    double energyArray[][] = getImageEnergy(img, true);
-    double maxArrayEnrg = 0;
-    double minArrayEnrg = 200;
+        Core.normalize(energyArray, energyArray, Core.NORM_MINMAX);
 
-        for (int i = 0; i < energyArray.length; i++) {
-            for (int j = 0; j < energyArray[i].length; j++) {
-                if(energyArray[i][j] < maxArrayEnrg){
-                    maxArrayEnrg = energyArray[i][j];
-                }else if(energyArray[i][j] > minArrayEnrg){
-                    minArrayEnrg = energyArray[i][j];
-                }
-
-
-            }
-        }
-
-        for (int i = 0; i < energyArray.length; i++) {
-            for (int j = 0; j < energyArray[i].length; j++) {
-                energyArray[i][j] = (energyArray[i][j] - maxArrayEnrg)/(minArrayEnrg-maxArrayEnrg);
-            }
-        }
-
-
-        test = Bitmap.createBitmap(energyArray.length, energyArray[1].length, Bitmap.Config.ARGB_8888);
-        for (int i = 0; i < energyArray.length; i++) {
-            for (int j = 0; j < energyArray[i].length; j++) {
-                //Log.d("DEBUG_TEST", "Val: " + energyArray[i][j] * 1000);
-                double out1 =  energyArray[i][j];
-                int out = (int) (out1* 1000);
-                //Log.d("DEBUG_TEST", "Val: " + out );
-                int colOut = Color.argb(255, out , out,out);
-                test.setPixel(i,j, colOut );
-            }
-        }
-
-
-        //Initialise the alpha&beta on the points
         int h = 1;
 
-        //create a matrix using the contructA method
-        double exampleArray[][] = arrayConstruct();
+        float floatArray[][] = matrixConstruct();
+        Mat gradientX = new Mat(energyArray.width(), energyArray.height(), CvType.CV_32FC1);
+        Mat gradientY = new Mat(energyArray.width(), energyArray.height(), CvType.CV_32FC1);
+        Imgproc.Sobel(energyArray, gradientX, CvType.CV_32FC1, 1, 0, 5, 1, 0, Core.BORDER_DEFAULT);
+        Imgproc.Sobel(energyArray, gradientY, CvType.CV_32FC1, 0, 1, 5, 1, 0, Core.BORDER_DEFAULT);
 
-        //inversion of matrix
-
-        beginSnakeRefactor();
-
+        return beginSnakeRefactor(gradientX, gradientY, floatArray);
     }
 
-    private void beginSnakeRefactor() {
+    private ArrayList<ArrayList> beginSnakeRefactor(Mat gradientX, Mat gradientY, float[][] floatArray) {
+
+        Mat pointX = new Mat(2, pointArray.size(), CvType.CV_32FC1);
+        Mat pointY = new Mat(2, pointArray.size(), CvType.CV_32FC1);
+        Mat coefMatrix = new Mat(floatArray.length, floatArray[0].length, CvType.CV_32FC1);
+        ArrayList<ArrayList> listOfPointers = new ArrayList<>();
+
+        for (int i = 0; i < coefMatrix.height(); i++) {
+            coefMatrix.put(i, 0, floatArray[i]);
+        }
+
+        Mat pointXY = new Mat(2, pointArray.size(), CvType.CV_32FC1);
+        float[] xTrans = new float[pointArray.size()];
+        float[] yTrans = new float[pointArray.size()];
+
+
+        for (int i = 0; i < pointArray.size(); i++) {
+            Point point = pointArray.get(i);
+            xTrans[i] = point.x;
+            yTrans[i] = point.y;
+        }
+        float[] test = {0, 0, 0, 0};
+
+
+        pointXY.put(0, 0, xTrans);
+        pointXY.put(1, 0, yTrans);
+        pointX.put(0, 0, xTrans);
+        pointX.put(1, 0, test);
+        pointY.put(0, 0, yTrans);
+        pointY.put(1, 0, test);
+
 
         for (int i = 0; i < maxIterations; i++) {
+            Mat outPutX = new Mat(2, pointArray.size(), CvType.CV_32FC1);
+            Mat outPutY = new Mat(2, pointArray.size(), CvType.CV_32FC1);
+
             //change this statement to alter iteration counter
-                if((i % 15) == 0){
-                    super.reSample();
-                }
 
-            double energyX = 0;//interpolation here
-            double energyY = 0;//interpolation here
+            Imgproc.remap(gradientX, outPutX, pointX, pointY, Imgproc.INTER_LINEAR);
+            Imgproc.remap(gradientY, outPutY, pointX, pointY, Imgproc.INTER_LINEAR);
 
 
+            Core.flip(outPutY, outPutY, 0);
+
+
+            //Imgproc.filter2D(outPutX,outPutX, CvType.CV_32FC1, coefMatrix);
+            //Imgproc.filter2D(outPutY,outPutY, CvType.CV_32FC1, coefMatrix);
+            Mat combineXY = new Mat(pointArray.size(), 2, CvType.CV_32FC1);
+            Core.add(outPutX, outPutY, combineXY);
+            Core.add(pointXY, combineXY, pointXY);
+
+            if ((i % 10) == 0) {
+            ArrayList<Point> pointTest = new ArrayList<>();
+
+            for (int j = 0; j < pointXY.width(); j++) {
+                Point newPoint = new Point();
+                double[] data0 = pointXY.get(0, j);
+                double[] data1 = pointXY.get(1, j);
+                newPoint.x = (int) data0[0];
+                newPoint.y = (int) data1[0];
+                pointTest.add(newPoint);
+            }
+            listOfPointers.add(pointTest);
+            }
         }
+
+
+
+
+
+        return listOfPointers;
     }
 
-    private void snakeResample() {
-        //alter the snake image to move the objects
-    }
 
-    private double[][] arrayConstruct() {
-       double testArray[][] = new double[1][1];
+    private float[][] matrixConstruct() {
+        double h = 1;
 
-        return testArray;
-    }
+        double a = 0, b = 0, c = 0, d = 0, e = 0;
 
-    private double[][] getDerivatives() {
-      double arrayOut[][] = new double[1][1];
+        for (int i = 0; i < pointArray.size(); i++) {
+            a = beta / Math.pow(h, 4.0);
+            b = (-2 * (beta + beta) / Math.pow(h, 4.0) - alpha + alpha / Math.pow(h, 2.0)) + 1;
+            c = (beta + 4 * beta + beta) / Math.pow(h, 4.0) + (alpha + alpha) / Math.pow(h, 2.0);
+            d = (-2 * (beta + beta) / Math.pow(h, 4.0) - alpha + alpha / Math.pow(h, 2.0));
+            e = beta / Math.pow(h, 4.0);
+        }
+
+        ArrayDeque<Double> B = new ArrayDeque<>();
+
+        B.add(c);
+        B.add(d);
+        B.add(e);
+        for (int i = 0; i < pointArray.size() - 4; i++) {
+            B.add((double) 0);
+        }
+        B.add(a);
+        B.add(b);
 
 
+        float returnArray[][] = new float[pointArray.size()][pointArray.size()];
+        for (int i = 0; i < pointArray.size(); i++) {
+            for (int j = 0; j < pointArray.size(); j++) {
+                double val = B.pop();
+                returnArray[j][i] = (float) val;
+                B.add(val);
+            }
+        }
 
-
-        return arrayOut;
+        return returnArray;
     }
 
     /**
-     *
-     * @param img Input image
+     * @param img      Input image
      * @param inverted Returns an inverted image if true
      * @return
      */
-    public double[][] getImageEnergy(Bitmap img,  boolean inverted){
-        int width = img.getWidth();
-        int height = img.getHeight();
-        double[][] energyArray = new double[width][height];
+    public Mat getImageEnergy(Bitmap img, boolean inverted) {
+        Mat matImg = new Mat(img.getWidth(), img.getHeight(), CvType.CV_32FC1);
 
-
-        Mat matImg = new Mat(img.getWidth(), img.getHeight(), CvType.CV_8UC1);
         Utils.bitmapToMat(img, matImg);
-
         Imgproc.cvtColor(matImg, matImg, Imgproc.COLOR_RGB2GRAY);
 
-        Bitmap energyImg = Bitmap.createBitmap(width,height, img.getConfig());
+        Mat outPutMat = new Mat(img.getWidth(), img.getHeight(), CvType.CV_32FC1);
+        Mat grad_x = new Mat(img.getWidth(), img.getHeight(), CvType.CV_32FC1), grad_y = new Mat(img.getWidth(), img.getHeight(), CvType.CV_32FC1);
+        Mat abs_grad_x = new Mat(img.getWidth(), img.getHeight(), CvType.CV_32FC1), abs_grad_y = new Mat(img.getWidth(), img.getHeight(), CvType.CV_32FC1);
 
+        int depth = CvType.CV_32FC1;
+        Imgproc.Sobel(matImg, grad_x, depth, 1, 0, 5, 1, 0, Core.BORDER_DEFAULT);
+        Imgproc.Sobel(matImg, grad_y, depth, 0, 1, 5, 1, 0, Core.BORDER_DEFAULT);
 
-        Mat outPut = new Mat();
-        Mat grad_x = new Mat(), grad_y = new Mat();
-        Mat abs_grad_x = new Mat(), abs_grad_y = new Mat();
+        Core.convertScaleAbs(grad_x, abs_grad_x);
+        Core.convertScaleAbs(grad_y, abs_grad_y);
 
-        int depth = CvType.CV_16S;
-        Imgproc.Sobel(matImg, grad_x, depth, 1,0,5, 1, 0, Core.BORDER_DEFAULT);
-        Imgproc.Sobel(matImg, grad_y, depth, 0,1,5, 1, 0,Core.BORDER_DEFAULT);
+        Core.addWeighted(abs_grad_x, 0.5, abs_grad_y, 0.5, 0, outPutMat);
 
-        Core.convertScaleAbs(grad_x,abs_grad_x);
-        Core.convertScaleAbs(grad_y,abs_grad_y);
-
-        Core.addWeighted(abs_grad_x,0.5,abs_grad_y, 0.5, 0, outPut);
-
-        if(inverted){
-            Core.bitwise_not(outPut,outPut);
+        if (inverted) {
+            Core.bitwise_not(outPutMat, outPutMat);
         }
 
-        Utils.matToBitmap(outPut, energyImg);
+        outPutMat.convertTo(outPutMat, CvType.CV_32FC1);
+        Core.sqrt(outPutMat, outPutMat);
 
-
-        for(int x = 0; x < width; x++){
-            for(int y = 0; y < height; y++){
-                try{
-                    //Log.d("DEBUG_TEST", "Pix Val: " + Math.sqrt(Color.blue(energyImg.getPixel(x,y))));
-                    energyArray[x][y] = Math.sqrt(Color.blue(energyImg.getPixel(x,y)));
-                }catch (Exception e){
-                    Log.d("DEBUG_TEST", "Error");
-                }
-            }
-        }
-        Log.d("DEBUG_TEST", "Done");
-
-
-        return energyArray;
+        return outPutMat;
     }
 
-    public Bitmap returnImage(){
+    public Bitmap returnTestImage() {
         return test;
     }
 }

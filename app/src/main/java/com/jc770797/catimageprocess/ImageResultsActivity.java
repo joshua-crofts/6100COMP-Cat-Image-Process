@@ -189,7 +189,7 @@ public class ImageResultsActivity extends AppCompatActivity {
         xMeanTxt.setText("xMean: " + linearVals[3]);
         yMeanTxt.setText("yMean: " + linearVals[4]);
 
-        exportString = "Final Value: " + linearVals[2] + " -b0: " + linearVals[0] + " -b1: " + linearVals[1] + " -Number of Points: " + pointArray.size() + " -xMean: " + linearVals[3] + " -yMean: " + linearVals[4];
+        exportString = " Final Value: " + linearVals[2] + " -b0: " + linearVals[0] + " -b1: " + linearVals[1] + " -Number of Points: " + pointArray.size() + " -xMean: " + linearVals[3] + " -yMean: " + linearVals[4] ;
         return linearVals;
     }
 

@@ -40,6 +40,7 @@ public class ResultListActivity extends AppCompatActivity {
             while ((text = br.readLine()) != null) {
                 sb.append(text).append("\n");
             }
+            sb.append("\n");
             mEditText.setText(sb.toString());
 
 
