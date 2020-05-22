@@ -1,7 +1,5 @@
 package com.jc770797.catimageprocess.fragments;
 
-
-import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -9,7 +7,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
-
 
 import androidx.fragment.app.Fragment;
 
@@ -36,13 +33,11 @@ public class SnakeOverlayPointsFragment extends Fragment {
         overlayImage = getView().findViewById(R.id.pointsOverlayImage);
         overlayImage.setImageBitmap(((ImageSnakeActivity) this.getActivity()).getOverlayImageImage());
 
-
         finishBtn = getView().findViewById(R.id.finishBtn);
 
         finishBtn.setOnClickListener(new View.OnClickListener() {
                                          @Override
                                          public void onClick(View v) {
-
                                              fragmentSwitch();
                                          }
                                      }
@@ -50,11 +45,10 @@ public class SnakeOverlayPointsFragment extends Fragment {
         pointListener();
     }
 
-
+    //listens for a users screen press and formulates image & screen points
     private void pointListener() {
         final int widthImg = ((ImageSnakeActivity) this.getActivity()).getImage().getWidth();
         final int heightImg = ((ImageSnakeActivity) this.getActivity()).getImage().getHeight();
-
         mainImage.getLocationOnScreen(viewCords);
         mainImage.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -71,17 +65,16 @@ public class SnakeOverlayPointsFragment extends Fragment {
                 return false;
             }
         });
-
     }
 
+    //switches the fragment
     private void fragmentSwitch() {
         ((ImageSnakeActivity) this.getActivity()).fragmentChange2();
     }
 
+    //calls the point adder functions and updates the overlay image
     private void pointAdd(int x, int y) {
         ((ImageSnakeActivity) this.getActivity()).pointAdder(x, y);
         overlayImage.setImageBitmap(((ImageSnakeActivity) this.getActivity()).getOverlayImageImage());
     }
-
-
 }

@@ -49,6 +49,18 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <Button
+        android:id="@+id/pointsBtn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:paddingRight="20dp"
+        android:text="Add Points"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <Button
         android:id="@+id/snakeStartBtn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -56,23 +68,6 @@
         android:layout_marginRight="8dp"
         android:text="Start Snake"
         app:layout_constraintStart_toStartOf="parent" />
-
-    <Button
-        android:id="@+id/testBtn"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="8dp"
-        android:layout_marginRight="8dp"
-        android:text="Test BTN" />
-
-    <Button
-        android:id="@+id/pointsBtn"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="8dp"
-        android:layout_marginRight="8dp"
-        android:text="Add Points"
-        android:textAppearance="@style/TextAppearance.AppCompat.Large" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"

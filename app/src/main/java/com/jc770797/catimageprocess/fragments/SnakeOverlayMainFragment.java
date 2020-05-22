@@ -1,12 +1,9 @@
 package com.jc770797.catimageprocess.fragments;
 
 import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.Path;
 import android.graphics.Point;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,7 +21,7 @@ import java.util.ArrayList;
 public class SnakeOverlayMainFragment extends Fragment {
 
     private ImageView mainImage, overlayImage;
-    private Button pointsBtn, snakeStartBtn, testBtn;
+    private Button pointsBtn, snakeStartBtn;
     private ArrayList<Point> pointArray;
     private TextView pointerCount;
 
@@ -64,10 +61,11 @@ public class SnakeOverlayMainFragment extends Fragment {
             snakeStartBtn.setEnabled(true);
             pointsBtn.setEnabled(false);
         }
-        testBtn = getView().findViewById(R.id.testBtn);
+
         buttonListener();
     }
 
+    //generic button listener class
     private void buttonListener() {
         pointsBtn.setOnClickListener(new View.OnClickListener() {
                                          @Override
@@ -79,48 +77,27 @@ public class SnakeOverlayMainFragment extends Fragment {
         snakeStartBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //start snake here
+
+                long startTime = System.nanoTime();
                 snakeStart();
+                long stopTime = System.nanoTime();
+                Log.d("FUNCTION_TIME_TEST", "Start Time: " + startTime + "  Stop Time: " + stopTime);
             }
         });
-        testBtn.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-
-                //splineTest();
-               // testImgSwitch();
-            }
-        });
-    }
-
-    private void splineTest() {
-
 
     }
 
-    private void testImgSwitch() {
-        switchImage(((ImageSnakeActivity) this.getActivity()).getTestImg());
-    }
-
+    //calls the snake start class from the activity, iterates over snake history upon completion
     private void snakeStart() {
         ((ImageSnakeActivity) this.getActivity()).snakeStart();
-
-        for (int i = 0; i < ( (ImageSnakeActivity) this.getActivity()).sizeOfPointerList(); i++) {
-            ( (ImageSnakeActivity) this.getActivity()).snakePlayback(i);
-            overlayImage.setImageBitmap(( (ImageSnakeActivity) this.getActivity()).reSample());
+        for (int i = 0; i < ((ImageSnakeActivity) this.getActivity()).sizeOfPointerList(); i++) {
+            ((ImageSnakeActivity) this.getActivity()).snakePlayback(i);
+            overlayImage.setImageBitmap(((ImageSnakeActivity) this.getActivity()).overlayBuilder());
         }
-
-
-
     }
 
+    //switches the fragment
     private void fragmentSwitch() {
         ((ImageSnakeActivity) this.getActivity()).fragmentChange();
     }
-
-    public void switchImage(Bitmap imgIn) {
-        mainImage.setImageBitmap(imgIn);
-    }
-
 }

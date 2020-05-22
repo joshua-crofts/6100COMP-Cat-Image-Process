@@ -68,6 +68,7 @@ public class ImageResultsActivity extends AppCompatActivity {
         }
         buttonListener();
     }
+    //Generic button listener
     private void buttonListener() {
         exitBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -118,9 +119,9 @@ public class ImageResultsActivity extends AppCompatActivity {
             }
         });
     }
-
+    //try and get the serialised point array
     private ArrayList<Point> getData() {
-        ArrayList<Point> arrayIN, tempArray;
+        ArrayList<Point> arrayIN;
         int numPoints = 0;
         try {
             Bundle b = getIntent().getExtras();
@@ -134,11 +135,9 @@ public class ImageResultsActivity extends AppCompatActivity {
         }
         return arrayIN;
     }
-
-
-
+    //basic chart setup
     private void chartSetup() {
-        double[] textVals = setTextValues();
+        double[] leastSquareData = setTextValues();
 
         AnyChartView regressionChart = findViewById(R.id.mainChart);
         regressionChart.setChart(null);
@@ -161,7 +160,7 @@ public class ImageResultsActivity extends AppCompatActivity {
                 .hAlign(HAlign.START)
                 .format("Y pos:  {%Value} \\nX pos: {%X}");
 
-        Line scatterSeriesLine = chartScatter.line(getLineData(textVals));
+        Line scatterSeriesLine = chartScatter.line(getLineData(leastSquareData));
         GradientKey gradientKey[] = new GradientKey[]{
                 new GradientKey("#abcabc", 0d, 1d),
                 new GradientKey("#cbacba", 40d, 1d)
@@ -171,9 +170,9 @@ public class ImageResultsActivity extends AppCompatActivity {
 
         regressionChart.setChart(chartScatter);
     }
-    //this does something
+    //set the text value for exporting data to text
     private double[] setTextValues() {
-        double[] linearVals = leastSquare();
+        double[] leastSquareData = leastSquare();
 
         TextView finalValTxt = findViewById(R.id.textView1);
         TextView b0Txt = findViewById(R.id.textView2);
@@ -182,57 +181,56 @@ public class ImageResultsActivity extends AppCompatActivity {
         TextView xMeanTxt = findViewById(R.id.textView5);
         TextView yMeanTxt = findViewById(R.id.textView6);
 
-        finalValTxt.setText("Final Value: " + linearVals[2]);
-        b0Txt.setText("b0: " + linearVals[0]);
-        b1Txt.setText("b1: " + linearVals[1]);
+        finalValTxt.setText("Final Value: " + leastSquareData[2]);
+        b0Txt.setText("b0: " + leastSquareData[0]);
+        b1Txt.setText("b1: " + leastSquareData[1]);
         countTxt.setText("Number of Points: " + pointArray.size());
-        xMeanTxt.setText("xMean: " + linearVals[3]);
-        yMeanTxt.setText("yMean: " + linearVals[4]);
+        xMeanTxt.setText("xMean: " + leastSquareData[3]);
+        yMeanTxt.setText("yMean: " + leastSquareData[4]);
 
-        exportString = " Final Value: " + linearVals[2] + " -b0: " + linearVals[0] + " -b1: " + linearVals[1] + " -Number of Points: " + pointArray.size() + " -xMean: " + linearVals[3] + " -yMean: " + linearVals[4] ;
-        return linearVals;
+        exportString = " Final Value: " + leastSquareData[2] + " -b0: " + leastSquareData[0] + " -b1: " + leastSquareData[1] + " -Number of Points: " + pointArray.size() + " -xMean: " + leastSquareData[3] + " -yMean: " + leastSquareData[4] ;
+        return leastSquareData;
     }
-
+    //least square method used to calculate the regression line
     private double[] leastSquare() {
         float xMean = 0, yMean = 0, xXSum = 0, xYSum = 0;
         double finalVal = 0;
         double b1 = 0, b0 = 0;
-        double[] aOut = new double[5];
+        double[] dataOutputArray = new double[5];
+        //find the mean value of the X and Y coordinates
         for (int i = 0; i < pointArray.size(); i++) {
             xMean += pointArray.get(i).x;
             yMean += pointArray.get(i).y;
         }
         xMean = xMean / pointArray.size();
         yMean = yMean / pointArray.size();
-
         for (int i = 0; i < pointArray.size(); i++) {
             xXSum += (pointArray.get(i).x - xMean) * (pointArray.get(i).x - xMean);
             xYSum += (pointArray.get(i).x - xMean) * (pointArray.get(i).y - yMean);
-
         }
-
+        //Calculate b1(line gradient), b0(Y intersect) and the final value (Ymean)
         b1 = xYSum / xXSum;
         b0 = yMean - (b1 * xMean);
         finalVal = b0 + (b1 * xMean);
-
-        aOut[0] = b0;
-        aOut[1] = b1;
-        aOut[2] = finalVal;
-        aOut[3] = xMean;
-        aOut[4] = yMean;
-        return aOut;
+        //save the data to an output array
+        dataOutputArray[0] = b0;
+        dataOutputArray[1] = b1;
+        dataOutputArray[2] = finalVal;
+        dataOutputArray[3] = xMean;
+        dataOutputArray[4] = yMean;
+        return dataOutputArray;
     }
-
-    private List<DataEntry> getLineData(double[] textVals) {
+    //uses the data to produce the regression line
+    private List<DataEntry> getLineData(double[] leastSquareData) {
         List<DataEntry> data = new ArrayList<>();
-        data.add(new ValueDataEntry(0, textVals[0]));
-        data.add(new ValueDataEntry(textVals[3], textVals[4]));
-        double gradX = textVals[3] - 0;
-        double gradY = textVals[4] - textVals[0];
-        data.add(new ValueDataEntry(gradX + textVals[3], gradY + textVals[4]));
+        data.add(new ValueDataEntry(0, leastSquareData[0]));
+        data.add(new ValueDataEntry(leastSquareData[3], leastSquareData[4]));
+        double gradX = leastSquareData[3] - 0;
+        double gradY = leastSquareData[4] - leastSquareData[0];
+        data.add(new ValueDataEntry(gradX + leastSquareData[3], gradY + leastSquareData[4]));
         return data;
     }
-
+    //uses point data to create the scatter points
     private List<DataEntry> getMarkerData() {
         List<DataEntry> data = new ArrayList<>();
         for (int i = 0; i < pointArray.size(); i++) {
@@ -242,6 +240,4 @@ public class ImageResultsActivity extends AppCompatActivity {
         }
         return data;
     }
-
-
 }

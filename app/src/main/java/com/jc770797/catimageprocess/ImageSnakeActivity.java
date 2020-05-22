@@ -17,12 +17,10 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
-
 
 import com.jc770797.catimageprocess.activeCont.KassSnake;
 import com.jc770797.catimageprocess.fragments.SnakeOverlayMainFragment;
@@ -30,7 +28,6 @@ import com.jc770797.catimageprocess.fragments.SnakeOverlayPointsFragment;
 
 import java.io.FileInputStream;
 import java.util.ArrayList;
-
 
 public class ImageSnakeActivity extends AppCompatActivity {
 
@@ -51,14 +48,6 @@ public class ImageSnakeActivity extends AppCompatActivity {
     private KassSnake kSnake;
     private String snakeType = "Kass";
 
-    public Bitmap getImage() {
-        return this.greyImageMap;
-    }
-
-    public Bitmap getOverlayImageImage() {
-        return this.overlayImage;
-    }
-
     private int iteratorAmount = 500;
 
     @Override
@@ -75,7 +64,6 @@ public class ImageSnakeActivity extends AppCompatActivity {
         fragmentTransaction.disallowAddToBackStack();
         fragmentTransaction.commit();
 
-
         Bitmap.Config config = Bitmap.Config.ARGB_8888;
         overlayImage = Bitmap.createBitmap(greyImageMap.getWidth(), greyImageMap.getHeight(), config);
 
@@ -90,7 +78,6 @@ public class ImageSnakeActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-
 
         iterationCounter = findViewById(R.id.numIteration);
         iterationBar = findViewById(R.id.iterationBar);
@@ -112,6 +99,7 @@ public class ImageSnakeActivity extends AppCompatActivity {
         });
     }
 
+    //starts the snake
     public void snakeStart() {
         Toast.makeText(ImageSnakeActivity.this, "Beginning Snake", Toast.LENGTH_SHORT).show();
         if (snakeType == "Greedy") {
@@ -122,10 +110,7 @@ public class ImageSnakeActivity extends AppCompatActivity {
             double delta = 1;
             double sigma = 3;
             double itterations = iteratorAmount;
-            Log.d("DEBUG_TEST", "Num Itt" + iteratorAmount);
-
-            Log.d("DEBUG_TEST", "Num of Itt" +iteratorAmount);
-            kSnake = new KassSnake(greyImageMap, pointArray, alpha, beta, delta, sigma, itterations, numPoint);
+            kSnake = new KassSnake(greyImageMap, pointArray, alpha, beta, delta, sigma, itterations);
             listOfpointers = kSnake.start();
             Toast.makeText(ImageSnakeActivity.this, "Snake Complete", Toast.LENGTH_SHORT).show();
         } else {
@@ -133,6 +118,7 @@ public class ImageSnakeActivity extends AppCompatActivity {
         }
     }
 
+    //changes the fragment to the point adder
     public void fragmentChange() {
         uiDisable();
         Fragment pointsOverlay = new SnakeOverlayPointsFragment();
@@ -142,15 +128,17 @@ public class ImageSnakeActivity extends AppCompatActivity {
         fragmentTransaction.commit();
     }
 
+    //changes the fragment to the main overlay
     public void fragmentChange2() {
         uiDisable();
         fragmentTransaction = frm.beginTransaction();
         fragmentTransaction.replace(R.id.fragmentHolder, mainOverlay);
         fragmentTransaction.disallowAddToBackStack();
         fragmentTransaction.commit();
-        reSample();
+        overlayBuilder();
     }
 
+    //disables various parts of the activity layout based on current fragment
     private void uiDisable() {
         int visibility = (uiSwitch == true) ? View.VISIBLE : View.INVISIBLE;
         iterationCounter.setVisibility(visibility);
@@ -158,6 +146,7 @@ public class ImageSnakeActivity extends AppCompatActivity {
         uiSwitch = !uiSwitch;
     }
 
+    //Initial overlay builder for the point adder class
     public void pointAdder(int x, int y) {
         createPoint(x, y);
         Canvas canvas = new Canvas(overlayImage);
@@ -167,7 +156,8 @@ public class ImageSnakeActivity extends AppCompatActivity {
         canvas.drawCircle(x, y, 5, paint);
     }
 
-    public Bitmap reSample() {
+    //builds the overlay bitmap using Android canvas and point array
+    public Bitmap overlayBuilder() {
         if (pointArray.size() != 0) {
             Bitmap imageReplace = Bitmap.createBitmap(overlayImage.getWidth(), overlayImage.getHeight(), overlayImage.getConfig());
             Canvas canvas = new Canvas(imageReplace);
@@ -195,10 +185,7 @@ public class ImageSnakeActivity extends AppCompatActivity {
         return overlayImage;
     }
 
-    public Bitmap getTestImg() {
-        return kSnake.returnTestImage();
-    }
-
+    //generic file getter function to pull images from local storage
     private void fileGetter() {
         String tempFilename = getIntent().getStringExtra("image");
         try {
@@ -208,9 +195,23 @@ public class ImageSnakeActivity extends AppCompatActivity {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
     }
 
+    //create points based on x, y coordinates
+    public void createPoint(int x, int y) {
+        Point point = new Point(x, y);
+        pointArray.add(point);
+        numPoint++;
+    }
+
+    //used to iterate through the snake history array
+    public void snakePlayback(int i) {
+        ArrayList<Point> pointerArray = listOfpointers.get(i);
+        pointArray = pointerArray;
+    }
+
+
+    //Various getters
     public int getPointNum() {
         return numPoint;
     }
@@ -219,19 +220,15 @@ public class ImageSnakeActivity extends AppCompatActivity {
         return pointArray;
     }
 
-    public void createPoint(int x, int y) {
-        Point point = new Point(x, y);
-        pointArray.add(point);
-        numPoint++;
-    }
-
-    public void snakePlayback(int i){
-            ArrayList<Point> pointerArray = listOfpointers.get(i);
-            pointArray = pointerArray;
-    }
-
-    public int sizeOfPointerList(){
+    public int sizeOfPointerList() {
         return listOfpointers.size();
     }
 
+    public Bitmap getImage() {
+        return this.greyImageMap;
+    }
+
+    public Bitmap getOverlayImageImage() {
+        return this.overlayImage;
+    }
 }

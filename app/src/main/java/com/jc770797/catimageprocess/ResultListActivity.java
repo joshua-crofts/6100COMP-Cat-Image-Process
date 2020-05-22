@@ -1,16 +1,9 @@
 package com.jc770797.catimageprocess;
 
-import android.content.Intent;
+
 import android.os.Bundle;
-import android.util.Log;
-import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.TextView;
-
 import androidx.appcompat.app.AppCompatActivity;
-
-import org.opencv.android.OpenCVLoader;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
@@ -42,8 +35,6 @@ public class ResultListActivity extends AppCompatActivity {
             }
             sb.append("\n");
             mEditText.setText(sb.toString());
-
-
 
         } catch (FileNotFoundException e) {
             e.printStackTrace();
