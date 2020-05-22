@@ -7,9 +7,11 @@ This app requires OpenCV to run which is not included in this repo. As such you 
 ```
 OpenCV 3.4.8 Android
 Android Studio 3.5.3
+AnyChart 
 ```
 [OpenCV Releases](https://opencv.org/releases/)
 ## Built With
 
 * [OpenCV](https://opencv.org/) - For image processing
 * [Android-Image-Cropper](https://github.com/ArthurHub/Android-Image-Cropper) - Cropping Tool used
+* [AnyChart-Android](https://github.com/AnyChart/AnyChart-Android) - Chart Tool used
